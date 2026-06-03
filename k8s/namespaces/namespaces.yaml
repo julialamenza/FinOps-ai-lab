@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payments
+  labels:
+    team: payments
+    environment: prod
+    cost-center: product
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: users
+  labels:
+    team: users
+    environment: prod
+    cost-center: product
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    team: platform
+    environment: staging
+    cost-center: engineering

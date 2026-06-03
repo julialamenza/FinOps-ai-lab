@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-spike
+  namespace: payments
+  labels:
+    app: cpu-spike
+    team: payments
+    environment: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-spike
+  template:
+    metadata:
+      labels:
+        app: cpu-spike
+        team: payments
+        environment: prod
+    spec:
+      containers:
+        - name: stress
+          image: polinux/stress
+          command: ["stress"]
+          args: ["--cpu", "2", "--timeout", "600s"]
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "128Mi"
+            limits:
+              cpu: "2000m"
+              memory: "512Mi"

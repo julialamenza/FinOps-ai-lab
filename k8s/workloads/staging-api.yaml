@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staging-api
+  namespace: staging
+  labels:
+    app: staging-api
+    team: platform
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staging-api
+  template:
+    metadata:
+      labels:
+        app: staging-api
+        team: platform
+        environment: staging
+    spec:
+      containers:
+        - name: app
+          image: nginx:stable
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: staging-api
+  namespace: staging
+  labels:
+    app: staging-api
+    team: platform
+    environment: staging
+spec:
+  selector:
+    app: staging-api
+  ports:
+    - port: 80
+      targetPort: 80

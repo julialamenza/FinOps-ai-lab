@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runaway-worker
+  namespace: payments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: runaway-worker
+  template:
+    metadata:
+      labels:
+        app: runaway-worker
+    spec:
+      containers:
+        - name: worker
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                dd if=/dev/zero of=/tmp/testfile bs=1M count=500
+                rm -f /tmp/testfile
+              done
