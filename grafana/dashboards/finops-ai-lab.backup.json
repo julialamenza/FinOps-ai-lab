@@ -1,0 +1,110 @@
+{
+  "title": "FinOps AI Lab",
+  "tags": ["finops", "ai", "kubernetes", "opencost"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Cluster CPU Usage",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m]))",
+          "legendFormat": "CPU cores"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Cluster Memory Usage GB",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024 / 1024",
+          "legendFormat": "Memory GB"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage by Namespace - millicores",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) * 1000",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory Usage by Namespace - MB",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 }
+    },
+    {
+      "type": "barchart",
+      "title": "CPU Requested by Namespace - cores",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by(namespace) (kube_pod_container_resource_requests{resource=\"cpu\", namespace=~\"payments|users|staging\"})",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 }
+    },
+    {
+      "type": "barchart",
+      "title": "Memory Requested by Namespace - GB",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "sum by(namespace) (kube_pod_container_resource_requests{resource=\"memory\", namespace=~\"payments|users|staging\"}) / 1024 / 1024 / 1024",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 }
+    },
+    {
+      "type": "table",
+      "title": "Top Pods CPU - millicores",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "topk(10, sum by(namespace, pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\", namespace=~\"payments|users|staging\"}[5m])) * 1000)",
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 }
+    },
+    {
+      "type": "table",
+      "title": "Top Pods Memory - MB",
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "targets": [
+        {
+          "expr": "topk(10, sum by(namespace, pod) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024)",
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 }
+    }
+  ]
+}
