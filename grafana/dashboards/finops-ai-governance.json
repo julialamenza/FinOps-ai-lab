@@ -1,0 +1,295 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Dashboard de governança e visibilidade de custos para a Aula 4. Mostra labels, ownership, namespaces e proxy de showback. Painéis de custo real dependem de OpenCost/Cost Explorer — aqui usamos requests como proxy didático.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Resource Overview",
+      "type": "row"
+    },
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "CPU Usage by Namespace",
+      "description": "Uso real de CPU por namespace. Base para alocação de custos (showback) quando cruzado com preço por core.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) * 1000",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Memory Usage by Namespace",
+      "description": "Memória em uso por namespace (MiB). Proxy didático para consumo — em produção cruzar com custo por GiB.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "CPU Requests by Namespace",
+      "description": "CPU reservada (requests) por namespace. Principal input para showback/chargeback em ambientes Kubernetes.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) * 1000",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Memory Requests by Namespace",
+      "description": "Memória reservada (requests) por namespace. Alternativa se vazio: kube_pod_container_resource_limits{resource=\"memory\"}.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\",namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 },
+      "id": 101,
+      "panels": [],
+      "title": "Governance & Labels",
+      "type": "row"
+    },
+    {
+      "id": 5,
+      "type": "text",
+      "title": "Namespace Label Coverage",
+      "description": "Labels esperadas para governança FinOps. Não há métrica Prometheus nativa para cobertura de labels — este painel documenta o padrão esperado.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Labels obrigatórias (padrão FinOps)\n\nPrometheus **não expõe** cobertura de labels de namespace diretamente. Use `kubectl` ou políticas Kyverno/OPA para auditar.\n\n### Labels esperadas em cada namespace/workload\n\n| Label | Exemplo | Propósito |\n|-------|---------|----------|\n| `team` | `payments` | Ownership do time |\n| `environment` | `prod` | Ambiente (prod/staging/dev) |\n| `cost-center` | `product` | Centro de custo financeiro |\n| `owner` | `team-payments@corp.com` | Responsável direto |\n| `service-tier` | `critical` | Criticidade do serviço |\n\n### Verificar labels no lab\n\n```bash\nkubectl get namespaces --show-labels\nkubectl get pods -A --show-labels | grep -E 'payments|users|staging'\n```\n\n> **Nota didática:** Em produção, use OPA Gatekeeper ou Kyverno para *enforce* labels obrigatórias na criação de recursos."
+      }
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "title": "Governance Matrix",
+      "description": "Matriz de governança esperada para os namespaces do laboratório.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Governance Matrix — Lab Namespaces\n\n| Namespace | team | environment | cost-center | owner | service-tier |\n|-----------|------|-------------|-------------|-------|-------------|\n| **payments** | `payments` | `prod` | `product` | `team-payments` | `critical` |\n| **users** | `users` | `prod` | `product` | `team-users` | `standard` |\n| **staging** | `platform` | `staging` | `engineering` | `team-platform` | `non-critical` |\n\n### Workloads mapeados\n\n| Workload | Namespace | Função |\n|----------|-----------|--------|\n| `payments-api` | payments | API de pagamentos (prod) |\n| `users-api` | users | API de usuários (prod) |\n| `staging-api` | staging | Ambiente de homologação |\n| `cpu-spike` | payments | Workload de anomalia (Aula 3) |\n\n> Esta matriz é a **fonte de verdade didática** do curso. Em produção, mantenha em um CMDB ou service catalog."
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+      "id": 102,
+      "panels": [],
+      "title": "Cost Visibility",
+      "type": "row"
+    },
+    {
+      "id": 7,
+      "type": "barchart",
+      "title": "Showback View by Namespace",
+      "description": "Proxy didático de showback: soma CPU requests + memory requests normalizados por namespace. Em ambiente real, cruzar com OpenCost ou AWS Cost Explorer por tag/label.",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 27 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "fillOpacity": 80,
+            "gradientMode": "hue",
+            "lineWidth": 1
+          },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "orientation": "horizontal",
+        "xTickLabelRotation": 0,
+        "barWidth": 0.8
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) * 1000",
+          "legendFormat": "{{namespace}} CPU (mCPU)",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\",namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}} Memory (MiB)",
+          "instant": true,
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "text",
+      "title": "Showback — Nota didática",
+      "description": "Explicação do proxy de showback usado no laboratório.",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 27 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Showback vs Chargeback\n\n### O que este gráfico mostra (proxy)\n\n- **CPU requests (mCPU)** e **Memory requests (MiB)** por namespace\n- Representa a **fatia de recursos reservados**, não custo em USD\n\n### O que faria em produção\n\n1. **OpenCost** — custo real por namespace, deployment e label\n2. **AWS Cost Explorer** — custo por tag `cost-center`, `team`, `environment`\n3. **Cruzamento** — `namespace × custo AWS × alocação %`\n\n### Fórmula simplificada de showback\n\n```\ncusto_namespace = custo_cluster × (requests_namespace / requests_total)\n```\n\n> **Nota didática:** O gráfico ao lado é uma **aproximação visual** para o laboratório local sem billing real. O objetivo é entender o *conceito* de alocação de custos."
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 37 },
+      "id": 103,
+      "panels": [],
+      "title": "Guardrails & Tooling",
+      "type": "row"
+    },
+    {
+      "id": 9,
+      "type": "text",
+      "title": "Guardrails Checklist",
+      "description": "Checklist de guardrails operacionais para governança FinOps.",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 38 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Guardrails Checklist\n\n### Infraestrutura Kubernetes\n\n- [ ] **ResourceQuota** por namespace — limita CPU/memória total\n- [ ] **LimitRange** padrão — requests/limits mínimos e máximos por container\n- [ ] **Labels obrigatórias** — team, environment, cost-center, owner, service-tier\n- [ ] **Owner obrigatório** — todo recurso tem responsável identificável\n\n### Políticas como código\n\n- [ ] **Kyverno / OPA Gatekeeper** — enforce de labels, limits e quotas\n- [ ] **Admission webhooks** — bloquear deploys sem labels ou com requests excessivos\n- [ ] **NetworkPolicy** — isolamento por namespace/ambiente\n\n### Processo operacional\n\n- [ ] **Revisão semanal de eficiência** — rightsizing, waste, anomalias\n- [ ] **Alertas de custo** — threshold por namespace/cost-center\n- [ ] **Showback mensal** — relatório para cada time\n\n### Verificar no lab\n\n```bash\nkubectl get resourcequota -A\nkubectl get limitrange -A\n```"
+      }
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "title": "OpenCost + AWS Cost Explorer",
+      "description": "Comparação entre ferramentas de visibilidade de custo Kubernetes vs cloud provider.",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 38 },
+      "options": {
+        "mode": "markdown",
+        "content": "## OpenCost vs AWS Cost Explorer\n\n| Aspecto | OpenCost | AWS Cost Explorer |\n|---------|----------|-------------------|\n| **Escopo** | Kubernetes (pods, namespaces, labels) | Cloud provider (serviços, contas, regiões) |\n| **Granularidade** | Por workload, container, label | Por serviço AWS, tag, linked account |\n| **Custo real** | Estimativa baseada em preços AWS | Billing real da fatura AWS |\n| **Forecast** | Limitado | Previsão de custo integrada |\n| **Setup** | In-cluster (Helm chart) | Console AWS / API |\n| **Ideal para** | Showback K8s, rightsizing workloads | Budgets, chargeback, otimização de serviços |\n\n### Quando usar cada um\n\n- **OpenCost** → \"Quanto custa o namespace `payments`?\"\n- **Cost Explorer** → \"Quanto gastamos em EC2, RDS e S3 este mês?\"\n- **Juntos** → Visão completa: cloud bill + alocação por time/workload\n\n### Instalar OpenCost no lab\n\n```bash\n./scripts/install-opencost.sh\n```\n\n> **Nota didática:** No Minikube local, OpenCost mostrará estimativas baseadas em preços públicos AWS, mesmo sem conta AWS real."
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["finops", "kubernetes", "ai", "governance", "cost"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "FinOps AI - Governance and Cost Visibility",
+  "uid": "finops-ai-governance",
+  "version": 1,
+  "weekStart": ""
+}

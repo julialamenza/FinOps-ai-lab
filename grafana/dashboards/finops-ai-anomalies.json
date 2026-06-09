@@ -1,0 +1,334 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Dashboard de anomalias e capacity planning para a Aula 3. Detecta spikes de CPU, compara com baseline e investiga o workload cpu-spike. Projeções são didáticas — o lab local não possui histórico de 30 dias.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Anomaly Detection",
+      "type": "row"
+    },
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Payments CPU Usage Timeline (mCPU)",
+      "description": "Uso de CPU por pod no namespace payments. Útil para identificar o spike do workload cpu-spike durante o exercício da Aula 3.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"payments\"}[1m])) * 1000",
+          "legendFormat": "{{pod}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "CPU Spike Detector - Payments",
+      "description": "Total de CPU do namespace payments com janela de 1 minuto para detecção rápida de anomalias. Spike visível ao executar ./scripts/start-anomaly.sh.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20,
+            "lineWidth": 2
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 200 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"payments\"}[1m])) * 1000",
+          "legendFormat": "payments total",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+      "id": 101,
+      "panels": [],
+      "title": "Workload Analysis",
+      "type": "row"
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Top CPU Consumers - Lab Namespaces",
+      "description": "Top 10 consumidores de CPU nos namespaces do laboratório. Atualização instantânea para snapshot do momento.",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": { "align": "auto", "displayMode": "auto" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "CPU (mCPU)" },
+              { "id": "decimals", "value": 1 }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "CPU (mCPU)", "desc": true }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[1m])) * 1000)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "renameByName": {
+              "Value": "CPU (mCPU)",
+              "namespace": "Namespace",
+              "pod": "Pod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Memory by Namespace",
+      "description": "Memória working set por namespace. Complementa a análise de anomalias — spikes de CPU podem preceder pressão de memória.",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 },
+      "id": 102,
+      "panels": [],
+      "title": "Pod Health & Capacity",
+      "type": "row"
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Pod Status by Namespace",
+      "description": "Contagem de pods por fase (Running, Pending, Failed, etc.) via kube_pod_status_phase. Requer kube-state-metrics.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "stacking": { "mode": "normal", "group": "A" }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace, phase) (kube_pod_status_phase{namespace=~\"payments|users|staging\"})",
+          "legendFormat": "{{namespace}} - {{phase}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Capacity Headroom - CPU",
+      "description": "Compara CPU allocatable do node vs uso total do cluster. Aproximação didática de headroom — em produção use métricas de autoscaler e forecast.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 5
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "CPU Allocatable (cores)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "CPU Requests Total (cores)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "CPU Usage Total (cores)" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_node_status_allocatable{resource=\"cpu\"})",
+          "legendFormat": "CPU Allocatable (cores)",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"})",
+          "legendFormat": "CPU Requests Total (cores)",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m]))",
+          "legendFormat": "CPU Usage Total (cores)",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+      "id": 103,
+      "panels": [],
+      "title": "Investigation Guide",
+      "type": "row"
+    },
+    {
+      "id": 7,
+      "type": "text",
+      "title": "Capacity Planning Notes",
+      "description": "Notas didáticas sobre limitações do laboratório local para capacity planning.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Capacity Planning — Notas Didáticas\n\n### Limitações do laboratório local\n\n- **Sem histórico real de 30 dias** — o Minikube reinicia e não persiste métricas de longo prazo.\n- **Projeções são didáticas** — gráficos de forecast aqui ilustram o *processo*, não previsões reais.\n- **Baseline curta** — use a janela de 1h deste dashboard como \"baseline\" temporária.\n\n### Processo que você deve aprender\n\n1. **Detectar** — identificar desvio (spike, trend, threshold breach)\n2. **Investigar** — correlacionar com deploys, pods, eventos\n3. **Correlacionar** — cruzar métricas (CPU, memória, status, logs)\n4. **Planejar** — decidir: scale up, rightsizing, quota, ou aceitar o risco\n\n> Em produção: CloudWatch, Datadog ou Prometheus com retention de 90+ dias + forecasting (Prophet, linear regression)."
+      }
+    },
+    {
+      "id": 8,
+      "type": "text",
+      "title": "cpu-spike Investigation",
+      "description": "Comandos para reproduzir e investigar a anomalia de CPU no laboratório.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Investigação do workload cpu-spike\n\n### Reproduzir a anomalia\n\n```bash\n./scripts/start-anomaly.sh\n```\n\n### Investigar no cluster\n\n```bash\nkubectl top pods -n payments\nkubectl get pods -n payments\nkubectl describe pod -n payments -l app=cpu-spike\n```\n\n### Parar a anomalia\n\n```bash\n./scripts/stop-anomaly.sh\n```\n\n### O que observar neste dashboard\n\n1. **Payments CPU Timeline** — novo pod `cpu-spike` aparece com alto consumo\n2. **CPU Spike Detector** — linha sobe abruptamente\n3. **Top CPU Consumers** — `cpu-spike` domina o ranking\n4. **Pod Status** — verificar se há pods Pending ou Failed\n\n> Use o prompt da **Aula 3** para gerar análise de anomalia com IA."
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["finops", "kubernetes", "ai", "anomalies", "capacity"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "FinOps AI - Anomalies and Capacity Planning",
+  "uid": "finops-ai-anomalies",
+  "version": 1,
+  "weekStart": ""
+}

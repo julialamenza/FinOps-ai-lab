@@ -1,0 +1,426 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Dashboard de rightsizing para a Aula 2 do curso FinOps com IA. Compara recursos reservados (requests) vs utilizados. Alguns painéis usam aproximações didáticas para o laboratório local.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "panels": [],
+      "title": "Overview",
+      "type": "row"
+    },
+    {
+      "id": 1,
+      "type": "text",
+      "title": "Sobre este dashboard",
+      "description": "Painel introdutório do dashboard de rightsizing.",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 1 },
+      "options": {
+        "mode": "markdown",
+        "content": "## FinOps AI - Rightsizing\n\nEste dashboard compara **recursos reservados (requests)** com **recursos realmente utilizados** nos namespaces `payments`, `users` e `staging`.\n\n> **Nota didática:** Em produção, rightsizing cruzaria dados de 14-30 dias com recomendações de VPA/Karpenter. No laboratório local, os gráficos de *waste percentage* são **aproximações** baseadas em requests vs usage em tempo real."
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 101,
+      "panels": [],
+      "title": "CPU - Usage vs Requests",
+      "type": "row"
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "CPU Usage by Namespace (mCPU)",
+      "description": "Uso real de CPU agregado por namespace. Métrica: container_cpu_usage_seconds_total via cAdvisor. Valores em millicores (mCPU).",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) * 1000",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "CPU Requests by Namespace (mCPU)",
+      "description": "CPU reservada via requests de pods. Métrica: kube_pod_container_resource_requests do kube-state-metrics. Se vazio, verifique se kube-state-metrics está instalado no cluster.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) * 1000",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 102,
+      "panels": [],
+      "title": "Memory - Usage vs Requests",
+      "type": "row"
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Memory Usage by Namespace (MiB)",
+      "description": "Memória em uso (working set) por namespace. Proxy didático para consumo real de memória no laboratório.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Memory Requests by Namespace (MiB)",
+      "description": "Memória reservada via requests. Alternativa se vazio: kube_pod_container_resource_limits{resource=\"memory\"}.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\",namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "id": 103,
+      "panels": [],
+      "title": "Waste Analysis",
+      "type": "row"
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "CPU Waste Percentage by Namespace",
+      "description": "Aproximação didática: (1 - usage/requests) × 100. Protegido contra divisão por zero com clamp_min. Valores altos indicam overprovisioning.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 75 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "clamp_min((1 - (sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) / clamp_min(sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}), 0.001))) * 100, 0) and on(namespace) sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) > 0",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Memory Waste Percentage by Namespace",
+      "description": "Aproximação didática: (1 - usage/requests) × 100 para memória. Protegido contra divisão por zero. Em produção, use janelas de 14+ dias.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 15
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 75 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "clamp_min((1 - (sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / clamp_min(sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\",namespace=~\"payments|users|staging\"}), 1))) * 100, 0) and on(namespace) sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\",namespace=~\"payments|users|staging\"}) > 0",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 32 },
+      "id": 104,
+      "panels": [],
+      "title": "Rightsizing Candidates",
+      "type": "row"
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Top CPU Overprovisioned Pods",
+      "description": "Pods com maior percentual de CPU desperdiçada (requests >> usage). Colunas: namespace, pod e waste %. Uso e request estimados via queries instantâneas.",
+      "gridPos": { "h": 10, "w": 16, "x": 0, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "align": "auto", "displayMode": "auto" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Value" },
+            "properties": [
+              { "id": "displayName", "value": "CPU Waste %" },
+              { "id": "unit", "value": "percent" },
+              { "id": "decimals", "value": 1 }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "CPU Waste %", "desc": true }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "topk(10, clamp_min((1 - (sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) / clamp_min(sum by (namespace, pod) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}), 0.001))) * 100, 0) and on(namespace, pod) sum by (namespace, pod) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) > 0)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace, pod) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=~\"payments|users|staging\"}) * 1000",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) * 1000",
+          "format": "table",
+          "instant": true,
+          "refId": "C"
+        }
+      ],
+      "transformations": [
+        { "id": "seriesToColumns", "options": { "byField": "pod" } },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true, "Time 1": true, "Time 2": true, "Time 3": true },
+            "renameByName": {
+              "Value #A": "CPU Waste %",
+              "Value #B": "CPU Request (mCPU)",
+              "Value #C": "CPU Usage (mCPU)",
+              "namespace": "Namespace",
+              "pod": "Pod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Rightsizing Candidates",
+      "description": "Destaque didático: payments e staging são os principais candidatos a rightsizing neste laboratório (overprovisioning intencional para fins de ensino).",
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 70 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "value_and_name"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "clamp_min((1 - (sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"payments\"}[5m])) / clamp_min(sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=\"payments\"}), 0.001))) * 100, 0)",
+          "legendFormat": "payments",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "clamp_min((1 - (sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"staging\"}[5m])) / clamp_min(sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=\"staging\"}), 0.001))) * 100, 0)",
+          "legendFormat": "staging",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "clamp_min((1 - (sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"users\"}[5m])) / clamp_min(sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\",namespace=\"users\"}), 0.001))) * 100, 0)",
+          "legendFormat": "users",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "title": "Ação recomendada",
+      "description": "Orientações didáticas para exercício de rightsizing.",
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 38 },
+      "options": {
+        "mode": "markdown",
+        "content": "### Candidatos esperados\n\n| Namespace | Status | Ação sugerida |\n|-----------|--------|---------------|\n| **payments** | Alto waste | Reduzir CPU requests de `payments-api` |\n| **staging** | Alto waste | Revisar requests de `staging-api` |\n| **users** | Moderado | Monitorar antes de alterar |\n\n> Use o prompt da **Aula 2** para gerar recomendações com IA."
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["finops", "kubernetes", "ai", "rightsizing"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "FinOps AI - Rightsizing",
+  "uid": "finops-ai-rightsizing",
+  "version": 1,
+  "weekStart": ""
+}

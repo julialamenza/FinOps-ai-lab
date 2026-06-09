@@ -32,18 +32,25 @@
 
 - [x] finops-ai-lab.json
 - [x] finops-ai-lab.backup.json
-- [ ] rightsizing-dashboard.json
-- [ ] governance-dashboard.json
+- [x] finops-ai-rightsizing.json
+- [x] finops-ai-anomalies.json
+- [x] finops-ai-governance.json
 
 ## Docs
 
 - [x] cronograma-curso.md
 - [x] roteiro-gravacao.md
 - [x] checklist-repo.md
+- [x] cronograma-gravacao.md
+- [x] guia-gravacao.md
+- [x] checklist-gravacao.md
+- [x] assets-gravacao.md
 
 ## Próximos itens
 
-- [ ] Criar prompts IA por aula
-- [ ] Criar dashboard de rightsizing
+- [x] Criar prompts IA por aula
+- [x] Criar dashboard de rightsizing
+- [x] Criar dashboard de anomalias
+- [x] Criar dashboard de governança
 - [ ] Criar Aula 3 no Gamma
-- [ ] Mapear AWS Cost Explorer nos roteiros
+- [x] Mapear AWS Cost Explorer nos roteiros
