@@ -6,10 +6,11 @@ Consolidar análise completa do laboratório, gerar plano de otimização contí
 
 ## Como usar na gravação
 
-1. Use este bloco na aula final, após revisar demos das aulas 1–4.
-2. Cole o prompt consolidado com todos os dados atualizados do seu cluster.
-3. Mostre como a IA acelera o relatório, mas a priorização final é humana.
-4. Feche o curso com o plano de 90 dias e os KPIs de acompanhamento.
+1. Use este bloco na aula final, após revisar demos das aulas 1–4
+2. Rode `./scripts/collect-lab-context.sh` e cole a saída no prompt mestre (Prompt 5)
+3. Percorra os 4 dashboards com intervalo **Last 15 minutes**
+4. Mostre como a IA acelera o relatório, mas a priorização final é humana
+5. Feche o curso com o plano de 90 dias e os KPIs de acompanhamento
 
 ---
 

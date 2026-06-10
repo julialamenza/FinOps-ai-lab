@@ -84,7 +84,7 @@ Legenda de dependências: ✅ = necessário | ⬜ = opcional | — = não aplic�
 | 3.1 | Detectando comportamento anormal de consumo | 8–10 | pendente | ✅ | ✅ | — | ✅ | Explicar baseline vs spike |
 | 3.2 | Investigando origem de anomalias operacionais | 10–12 | pendente | ✅ | ✅ | ✅ | ✅ | Preparar `cpu-spike` |
 | 3.3 | Planejamento operacional de capacidade | 10–12 | pendente | ✅ | ✅ | ⬜ | ✅ | Painel Capacity Headroom |
-| 3.4 | Otimizando uso de recursos em cloud | 10–12 | pendente | ✅ | ⬜ | ⬜ | ⬜ | Conceito; gráficos de slide como exemplo |
+| 3.4 | Otimizando uso de recursos em cloud | 10–12 | pendente | ✅ | ✅ | ✅ | ✅ | `start-staging-anomaly.sh` + Prompt 4 |
 | 3.5 | Hands-on — análise de anomalias e capacidade operacional | 12–15 | pendente | ⬜ | ✅ | ✅ | ✅ | `start-anomaly.sh` + `stop-anomaly.sh` |
 
 ### Aula 4 — Governança operacional e visibilidade de custos
@@ -127,6 +127,7 @@ Atualize esta tabela conforme avançar na gravação.
 
 | Arquivo | Uso |
 |---------|-----|
+| `docs/folha-gravacao.md` | **Folha operacional** — comandos, port-forwards e fluxo por aula/vídeo |
 | `docs/guia-gravacao.md` | Preparação técnica, port-forwards, demos por aula |
 | `docs/roteiro-gravacao.md` | Roteiro detalhado de cada vídeo |
 | `docs/checklist-gravacao.md` | Checklist antes, durante e depois da gravação |

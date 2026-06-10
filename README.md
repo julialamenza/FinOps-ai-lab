@@ -43,7 +43,9 @@ Objetivo do laboratório:
 * payments → workload overprovisionado para exercícios de rightsizing
 * users → workload saudável utilizado como baseline
 * staging → workload subutilizado para exercícios de scheduling e otimização
-* cpu-spike → workload temporário para demonstrações de anomalias
+* cpu-spike → workload temporário para demonstrações de anomalias de CPU
+* backup-sync → CronJob em staging para anomalia silenciosa de custo (Aula 3)
+* business-hours-load → geradores de tráfego HTTP que simulam padrões de uso por horário comercial
 
 ---
 
@@ -150,7 +152,7 @@ kubectl get ns --show-labels
 
 ---
 
-### 5. Importar o dashboard no Grafana
+### 5. Importar os dashboards no Grafana
 
 Abra o Grafana:
 
@@ -171,28 +173,90 @@ kubectl get secret -n monitoring monitoring-grafana \
 -o jsonpath="{.data.admin-password}" | base64 -d
 ```
 
-Importe:
+Importe cada JSON (Dashboards → New → Import → Upload JSON → datasource Prometheus):
 
-```text
-grafana/dashboards/finops-ai-lab.json
-```
+| Dashboard | Arquivo | Aula |
+| --------- | ------- | ---- |
+| Principal | `grafana/dashboards/finops-ai-lab.json` | 1 |
+| Rightsizing | `grafana/dashboards/finops-ai-rightsizing.json` | 2 |
+| Anomalies | `grafana/dashboards/finops-ai-anomalies.json` | 3 |
+| Governance | `grafana/dashboards/finops-ai-governance.json` | 4 |
 
-Passos:
-
-1. Dashboards
-2. New
-3. Import
-4. Upload JSON
-5. Selecionar datasource Prometheus
+> O lab é montado na hora da gravação. Use intervalo **Last 15 minutes** nos dashboards — não é necessário histórico longo.
 
 ---
 
-### 6. Simular anomalias de CPU
+### 6. Simular carga por horário comercial
 
-Iniciar:
+Gera tráfego HTTP realista contra as APIs do laboratório para demonstrar padrões de uso ao longo do dia. Útil para exercícios de observabilidade e comparação entre workloads.
+
+Requer que `./scripts/deploy-lab.sh` já tenha sido executado.
+
+Iniciar (modo demo — padrão):
+
+```bash
+./scripts/start-business-hours-load.sh
+```
+
+O modo **demo** comprime um dia inteiro em ~12 minutos e repete automaticamente:
+
+| Fase      | Duração | Comportamento de `payments` |
+| --------- | ------- | --------------------------- |
+| Comercial | 0–6 min | Alto (rajadas de requisições) |
+| Fora do pico | 6–9 min | Médio |
+| Noite/fim de semana | 9–12 min | Baixo |
+
+Para usar o relógio real (seg–sex 09h–18h, `America/Sao_Paulo`):
+
+```bash
+./scripts/start-business-hours-load.sh --real
+```
+
+Parar:
+
+```bash
+./scripts/stop-business-hours-load.sh
+```
+
+| Gerador de carga        | Namespace | Comportamento                          |
+| ----------------------- | --------- | -------------------------------------- |
+| payments-business-load  | payments  | Oscila conforme horário comercial     |
+| users-steady-load       | users     | Tráfego estável o dia todo             |
+| staging-idle-load       | staging   | Quase ocioso (1 requisição/min)        |
+
+Manifest: `k8s/workloads/business-hours-load.yaml`
+
+Para ver a tendência no Grafana após iniciar o modo demo:
+
+1. **Gravação:** aguarde 2–3 minutos e abra `finops-ai-lab.json` com **Last 15 minutes**
+2. **Demo completa:** aguarde ~12 minutos para ver o ciclo inteiro
+3. Compare: `payments` oscila, `users` estável, `staging` quase flat
+
+Coletar dados para prompts de IA:
+
+```bash
+./scripts/collect-lab-context.sh
+```
+
+---
+
+### 7. Simular anomalias (Aula 3)
+
+#### 7a. Spike de CPU em payments
+
+Fluxo recomendado para gravação (baseline realista + spike):
+
+```bash
+./scripts/start-business-hours-load.sh
+sleep 120
+./scripts/start-anomaly.sh
+```
+
+Ou apenas o spike (visível em ~30s):
 
 ```bash
 ./scripts/start-anomaly.sh
+./scripts/start-anomaly.sh --duration 180   # spike de 3 min
 ```
 
 Parar:
@@ -201,7 +265,33 @@ Parar:
 ./scripts/stop-anomaly.sh
 ```
 
-O workload `cpu-spike` utiliza a imagem `polinux/stress` para gerar carga artificial.
+Coletar dados para colar nos prompts de IA:
+
+```bash
+./scripts/collect-anomaly-context.sh
+```
+
+Dashboard: `finops-ai-anomalies.json` — painéis **CPU Spike Detector** e **Top CPU Consumers**.
+
+#### 7b. Anomalia silenciosa em staging (vídeo 3.4)
+
+CronJob `backup-sync` que sobe custo/CPU em rajadas sem incidente de disponibilidade. Um job é disparado imediatamente — não precisa esperar o schedule.
+
+```bash
+./scripts/start-staging-anomaly.sh
+```
+
+Parar:
+
+```bash
+./scripts/stop-staging-anomaly.sh
+```
+
+Parar todas as anomalias de uma vez:
+
+```bash
+./scripts/stop-all-anomalies.sh
+```
 
 ---
 
@@ -311,6 +401,15 @@ kubectl describe deployment staging-api -n staging
 
 # Pods
 kubectl get pods -A
+
+# Geradores de carga por horário comercial
+kubectl get pods -n payments -l app=payments-business-load
+kubectl get pods -n users -l app=users-steady-load
+kubectl get pods -n staging -l app=staging-idle-load
+
+# Contexto para prompts de IA
+./scripts/collect-lab-context.sh
+./scripts/collect-anomaly-context.sh
 ```
 
 ---
@@ -319,9 +418,9 @@ kubectl get pods -A
 
 | Aula   | Tema                                                  | Recursos utilizados                          |
 | ------ | ----------------------------------------------------- | -------------------------------------------- |
-| Aula 1 | Observabilidade de custos e comportamento operacional | Grafana, Prometheus, Namespaces, OpenCost    |
+| Aula 1 | Observabilidade de custos e comportamento operacional | Grafana, Prometheus, Namespaces, OpenCost, business-hours-load |
 | Aula 2 | Rightsizing e eficiência operacional automatizada     | Grafana, OpenCost, payments-api, staging-api |
-| Aula 3 | Anomalias de custo e capacity planning                | cpu-spike, Grafana, Prometheus               |
+| Aula 3 | Anomalias de custo e capacity planning                | cpu-spike, backup-sync, finops-ai-anomalies.json, collect-anomaly-context |
 | Aula 4 | Governança operacional e visibilidade de custos       | Labels, Cost Centers, Namespaces             |
 | Aula 5 | Operações cloud orientadas por eficiência             | Fluxo completo de análise, otimização e IA   |
 
@@ -354,7 +453,10 @@ finops-ai-lab/
 ├── docs/                    # Cronograma, roteiro e checklist
 ├── grafana/
 │   └── dashboards/
-│       └── finops-ai-lab.json
+│       ├── finops-ai-lab.json
+│       ├── finops-ai-rightsizing.json
+│       ├── finops-ai-anomalies.json
+│       └── finops-ai-governance.json
 ├── k8s/
 │   ├── anomalies/
 │   ├── namespaces/
@@ -364,7 +466,14 @@ finops-ai-lab/
 │   ├── cleanup-lab.sh
 │   ├── install-opencost.sh
 │   ├── start-anomaly.sh
-│   └── stop-anomaly.sh
+│   ├── stop-anomaly.sh
+│   ├── start-staging-anomaly.sh
+│   ├── stop-staging-anomaly.sh
+│   ├── stop-all-anomalies.sh
+│   ├── collect-anomaly-context.sh
+│   ├── collect-lab-context.sh
+│   ├── start-business-hours-load.sh
+│   └── stop-business-hours-load.sh
 └── README.md
 ```
 
@@ -372,6 +481,7 @@ finops-ai-lab/
 
 ## Documentação do curso
 
+* docs/folha-gravacao.md — **folha operacional para gravar** (comandos, port-forwards, fluxo por aula)
 * docs/cronograma-curso.md
 * docs/roteiro-gravacao.md
 * docs/checklist-repo.md

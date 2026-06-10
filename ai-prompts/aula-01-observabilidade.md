@@ -6,10 +6,12 @@ Apoiar a análise de consumo por namespace, identificar desperdícios operaciona
 
 ## Como usar na gravação
 
-1. Abra o Grafana ou rode `kubectl get deploy -A` antes de colar o prompt.
-2. Copie o bloco inteiro (prompt + dados) para a ferramenta de IA.
-3. Substitua os valores de exemplo pelos números reais do dashboard, se disponíveis.
-4. Use a resposta para comentar slides ou conectar teoria com a demo ao vivo.
+O lab é montado na hora — não precisa de histórico de 24h.
+
+1. Rode `./scripts/start-business-hours-load.sh` e aguarde 2–3 min (tráfego realista)
+2. Abra `finops-ai-lab.json` com intervalo **Last 15 minutes**
+3. Rode `./scripts/collect-lab-context.sh` e cole a saída no prompt (substitui os números de exemplo)
+4. Use a resposta para comentar slides ou conectar teoria com a demo ao vivo
 
 ---
 

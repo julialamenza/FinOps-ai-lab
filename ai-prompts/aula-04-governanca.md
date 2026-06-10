@@ -6,10 +6,11 @@ Avaliar qualidade de labels, ownership, cost-center, environment, modelos de sho
 
 ## Como usar na gravação
 
-1. Rode `kubectl get ns --show-labels` e mostre os labels na tela.
-2. Cole o prompt escolhido e substitua labels ou gaps reais que encontrar no cluster.
-3. Use a resposta para discutir showback vs. chargeback e políticas de namespace.
-4. Conecte com o dashboard Grafana filtrado por label `team` ou `environment`.
+1. Abra `finops-ai-governance.json` e rode `./scripts/collect-lab-context.sh`
+2. Mostre `kubectl get ns --show-labels` na tela
+3. Cole o prompt escolhido com a saída do script (labels reais do cluster)
+4. Use a resposta para discutir showback vs. chargeback e políticas de namespace
+5. Conecte com o dashboard Grafana filtrado por label `team` ou `environment`
 
 ---
 

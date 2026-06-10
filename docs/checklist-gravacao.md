@@ -19,7 +19,7 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] Grafana acessível via port-forward (`localhost:3000`)
 - [ ] OpenCost instalado (`kubectl get pods -n opencost`)
 - [ ] Workloads do lab rodando (`kubectl get deploy -A | grep -E 'payments|users|staging'`)
-- [ ] `cpu-spike` **desativado** (`./scripts/stop-anomaly.sh` executado)
+- [ ] Anomalias **desativadas** (`./scripts/stop-all-anomalies.sh` executado)
 
 ### Dashboards
 
@@ -34,6 +34,7 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 
 - [ ] Prompts da aula abertos (`ai-prompts/aula-0X-*.md`)
 - [ ] Slides da aula abertos e revisados
+- [ ] `docs/folha-gravacao.md` aberto (comandos, port-forwards, fluxo por vídeo)
 - [ ] `docs/roteiro-gravacao.md` aberto para consulta
 - [ ] `docs/guia-gravacao.md` consultado para comandos da demo
 
@@ -71,9 +72,10 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 ### Aula 3 — Anomalias
 
 - [ ] Dashboard anomalies (`finops-ai-anomalies.json`) importado e com dados
-- [ ] `./scripts/start-anomaly.sh` testado — spike visível no Grafana
-- [ ] `./scripts/stop-anomaly.sh` testado — baseline restaurado
-- [ ] `kubectl top pods -n payments` testado com e sem cpu-spike
+- [ ] `./scripts/start-anomaly.sh` testado — spike visível no Grafana em ~30s
+- [ ] `./scripts/start-staging-anomaly.sh` testado — job `backup-sync` criado imediatamente
+- [ ] `./scripts/stop-all-anomalies.sh` testado — baseline restaurado
+- [ ] `./scripts/collect-anomaly-context.sh` testado — saída utilizável nos prompts
 - [ ] Prompt de `ai-prompts/aula-03-anomalias.md` revisado
 
 ### Aula 4 — Governança

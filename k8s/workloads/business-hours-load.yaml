@@ -1,0 +1,171 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments-business-load
+  namespace: payments
+  labels:
+    app: payments-business-load
+    team: payments
+    environment: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payments-business-load
+  template:
+    metadata:
+      labels:
+        app: payments-business-load
+        team: payments
+        environment: prod
+    spec:
+      containers:
+        - name: load
+          image: curlimages/curl:8.5.0
+          env:
+            - name: LOAD_PROFILE
+              value: demo
+            - name: TZ
+              value: America/Sao_Paulo
+          command:
+            - sh
+            - -c
+            - |
+              burst_high() {
+                for _ in 1 2 3 4 5 6 7 8; do
+                  curl -s -o /dev/null http://payments-api/ &
+                done
+                wait
+                sleep 0.08
+              }
+
+              burst_low() {
+                curl -s -o /dev/null http://payments-api/
+                sleep "$1"
+              }
+
+              demo_phase() {
+                START=$(date +%s)
+                CYCLE=720
+
+                while true; do
+                  ELAPSED=$(( $(date +%s) - START ))
+                  PHASE=$(( ELAPSED % CYCLE ))
+
+                  if [ "$PHASE" -lt 360 ]; then
+                    burst_high
+                  elif [ "$PHASE" -lt 540 ]; then
+                    burst_low 1
+                  else
+                    burst_low 3
+                  fi
+                done
+              }
+
+              real_phase() {
+                while true; do
+                  H=$(date +%H)
+                  D=$(date +%u)
+
+                  if [ "$D" -le 5 ] && [ "$H" -ge 9 ] && [ "$H" -lt 18 ]; then
+                    burst_high
+                  elif [ "$D" -le 5 ]; then
+                    burst_low 1
+                  else
+                    burst_low 3
+                  fi
+                done
+              }
+
+              if [ "${LOAD_PROFILE:-demo}" = "real" ]; then
+                real_phase
+              else
+                demo_phase
+              fi
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+            limits:
+              cpu: "300m"
+              memory: "64Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-steady-load
+  namespace: users
+  labels:
+    app: users-steady-load
+    team: users
+    environment: prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-steady-load
+  template:
+    metadata:
+      labels:
+        app: users-steady-load
+        team: users
+        environment: prod
+    spec:
+      containers:
+        - name: load
+          image: curlimages/curl:8.5.0
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                curl -s -o /dev/null http://users-api/
+                sleep 0.25
+              done
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "64Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staging-idle-load
+  namespace: staging
+  labels:
+    app: staging-idle-load
+    team: platform
+    environment: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staging-idle-load
+  template:
+    metadata:
+      labels:
+        app: staging-idle-load
+        team: platform
+        environment: staging
+    spec:
+      containers:
+        - name: load
+          image: curlimages/curl:8.5.0
+          command:
+            - sh
+            - -c
+            - |
+              while true; do
+                curl -s -o /dev/null http://staging-api/
+                sleep 60
+              done
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "32Mi"
+            limits:
+              cpu: "50m"
+              memory: "64Mi"

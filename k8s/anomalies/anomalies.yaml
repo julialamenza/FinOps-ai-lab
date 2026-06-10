@@ -1,26 +1,41 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: runaway-worker
-  namespace: payments
+  name: backup-sync
+  namespace: staging
+  labels:
+    app: backup-sync
+    team: platform
+    environment: staging
+    cost-center: engineering
+    workload-type: anomaly-demo
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: runaway-worker
-  template:
-    metadata:
-      labels:
-        app: runaway-worker
+  schedule: "*/2 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
+  jobTemplate:
     spec:
-      containers:
-        - name: worker
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              while true; do
-                dd if=/dev/zero of=/tmp/testfile bs=1M count=500
-                rm -f /tmp/testfile
-              done
+      activeDeadlineSeconds: 180
+      template:
+        metadata:
+          labels:
+            app: backup-sync
+            team: platform
+            environment: staging
+            cost-center: engineering
+            workload-type: anomaly-demo
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: backup
+              image: polinux/stress
+              command: ["stress"]
+              args: ["--cpu", "1", "--timeout", "90s"]
+              resources:
+                requests:
+                  cpu: "100m"
+                  memory: "64Mi"
+                limits:
+                  cpu: "400m"
+                  memory: "128Mi"

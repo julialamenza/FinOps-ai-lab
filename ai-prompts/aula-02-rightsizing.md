@@ -6,10 +6,13 @@ Gerar recomendações de requests/limits com base em CPU e memória (média e P9
 
 ## Como usar na gravação
 
-1. Colete CPU/memória média e P95 no Grafana antes de gravar (ou use os exemplos abaixo).
-2. Copie o prompt que combina com o workload em discussão (`payments-api` é o caso principal de over-provisioning).
-3. Peça à IA que justifique cada recomendação com margem de segurança (headroom).
-4. Na gravação, mostre que você **não aplicaria** a mudança sem validar em staging e sem acordo do time.
+O lab é montado na hora — use intervalo **Last 15 minutes** no dashboard `finops-ai-rightsizing.json`.
+
+1. Rode `./scripts/collect-lab-context.sh` para obter requests/limits e consumo ao vivo
+2. Copie o prompt que combina com o workload em discussão (`payments-api` é o caso principal de over-provisioning)
+3. Cole a saída do script no prompt ou substitua os valores de exemplo
+4. Peça à IA que justifique cada recomendação com margem de segurança (headroom)
+5. Na gravação, mostre que você **não aplicaria** a mudança sem validar em staging e sem acordo do time
 
 ---
 

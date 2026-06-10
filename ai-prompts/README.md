@@ -36,17 +36,21 @@ Eles não representam métricas ao vivo do seu cluster. Para demos autênticas, 
 
 ### Coletando dados do laboratório
 
+O lab é montado na hora da gravação. Use os scripts abaixo para gerar um bloco pronto para colar nos prompts:
+
 ```bash
-# Uso atual por pod
-kubectl top pods -A
+# Aulas 1, 2, 4 e 5 — panorama geral do cluster
+./scripts/collect-lab-context.sh
 
-# Uso atual por namespace
-kubectl top pods -A
+# Aula 3 — contexto de anomalias (cpu-spike, backup-sync)
+./scripts/collect-anomaly-context.sh
+```
 
-# Deployments
+Comandos manuais úteis:
+
+```bash
+kubectl top pods -A
 kubectl get deploy -A
-
-# Labels de governança
 kubectl get ns --show-labels
 
 # Requests e limits

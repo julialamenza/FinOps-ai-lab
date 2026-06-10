@@ -331,10 +331,16 @@ Slides:
 - Slides de otimização e prevenção
 
 Demo:
-Conceitual. Gráficos de slide como exemplos.
+```bash
+./scripts/start-staging-anomaly.sh
+kubectl get jobs -n staging -l app=backup-sync
+kubectl top pods -n staging
+```
+
+Mostrar que staging-api está estável, mas jobs `backup-sync` geram rajadas de CPU/custo.
 
 Prompt IA:
-Prompt 4 — Anomalia silenciosa em staging (opcional)
+Prompt 4 — Anomalia silenciosa em staging
 
 Tempo estimado:
 10–12 min
@@ -352,18 +358,19 @@ Nenhum.
 Demo:
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+./scripts/start-business-hours-load.sh
+sleep 120
 ./scripts/start-anomaly.sh
-kubectl top pods -n payments
-kubectl get pods -n payments
+./scripts/collect-anomaly-context.sh
 # ... análise no dashboard ...
-./scripts/stop-anomaly.sh
+./scripts/stop-all-anomalies.sh
 ```
 
-1. Abrir dashboard `finops-ai-anomalies.json`
-2. Mostrar baseline, ativar spike, investigar Top CPU Consumers
+1. Abrir dashboard `finops-ai-anomalies.json` (Last 15 minutes)
+2. Mostrar baseline com business-hours-load, ativar spike, investigar Top CPU Consumers
 3. Verificar Capacity Headroom
-4. Colar Prompt 5 — Runbook de resposta a anomalias
-5. Parar anomalia e confirmar retorno ao baseline
+4. Colar saída de `collect-anomaly-context.sh` no Prompt 5 — Runbook de resposta a anomalias
+5. Parar anomalias e confirmar retorno ao baseline
 
 Prompt IA:
 Prompt 5 — Runbook de resposta a anomalias

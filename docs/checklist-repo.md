@@ -27,6 +27,13 @@
 - [x] install-opencost.sh
 - [x] start-anomaly.sh
 - [x] stop-anomaly.sh
+- [x] start-staging-anomaly.sh
+- [x] stop-staging-anomaly.sh
+- [x] stop-all-anomalies.sh
+- [x] collect-anomaly-context.sh
+- [x] collect-lab-context.sh
+- [x] start-business-hours-load.sh
+- [x] stop-business-hours-load.sh
 
 ## Grafana
 
@@ -39,6 +46,7 @@
 ## Docs
 
 - [x] cronograma-curso.md
+- [x] folha-gravacao.md
 - [x] roteiro-gravacao.md
 - [x] checklist-repo.md
 - [x] cronograma-gravacao.md

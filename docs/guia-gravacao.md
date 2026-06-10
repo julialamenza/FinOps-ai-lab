@@ -37,11 +37,12 @@ Selecione o datasource **Prometheus** em cada import.
 | Checklist | `docs/checklist-gravacao.md` |
 | Slides | Apresentação Gamma/PPT da aula correspondente |
 
-### 4. Garantir que cpu-spike está parado
+### 4. Garantir que anomalias estão paradas
 
 ```bash
-./scripts/stop-anomaly.sh
+./scripts/stop-all-anomalies.sh
 kubectl get pods -n payments
+kubectl get cronjobs,jobs -n staging
 ```
 
 ---
@@ -203,12 +204,12 @@ Se algum pod estiver em `CrashLoopBackOff` ou `Pending`, resolva antes de gravar
 
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl get ns --show-labels
-kubectl get deploy -A
-kubectl top pods -A
+./scripts/start-business-hours-load.sh
+sleep 120
+./scripts/collect-lab-context.sh
 ```
 
-1. Abrir dashboard `finops-ai-lab.json`
+1. Abrir dashboard `finops-ai-lab.json` (intervalo **Last 15 minutes**)
 2. Comentar gauges de CPU/memória por namespace
 3. Mostrar Top CPU/Memory Consumers
 4. Colar Prompt 1 de `aula-01-observabilidade.md` na IA
@@ -238,23 +239,36 @@ kubectl top pods -n payments
 
 ### Aula 3 — Anomalias e capacity planning
 
-**Vídeos teóricos (3.1–3.4):** slides + dashboard anomalies nos vídeos 3.1–3.3.
+**Vídeos teóricos (3.1–3.3):** slides + dashboard anomalies.
+
+**Vídeo 3.4 — Anomalia silenciosa:**
+
+```bash
+./scripts/start-staging-anomaly.sh
+kubectl get jobs -n staging -l app=backup-sync
+kubectl top pods -n staging
+```
+
+1. Abrir `finops-ai-anomalies.json` (intervalo Last 15 minutes)
+2. Mostrar que staging-api está estável, mas jobs de `backup-sync` consomem CPU
+3. Colar **Prompt 4** de `aula-03-anomalias.md`
+4. Encerrar com `./scripts/stop-staging-anomaly.sh`
 
 **Vídeo 3.5 — Hands-on:**
 
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+./scripts/start-business-hours-load.sh
+sleep 120
 ./scripts/start-anomaly.sh
-kubectl top pods -n payments
-kubectl get pods -n payments
+./scripts/collect-anomaly-context.sh
 ```
 
 1. Abrir dashboard `finops-ai-anomalies.json`
-2. Observar baseline em Payments CPU Timeline
-3. Executar `start-anomaly.sh` e mostrar spike no CPU Spike Detector
-4. Verificar `cpu-spike` no Top CPU Consumers
-5. Colar Prompt 1 de `aula-03-anomalias.md` com dados do spike
-6. Encerrar com `./scripts/stop-anomaly.sh`
+2. Mostrar spike no CPU Spike Detector (~30s após start-anomaly)
+3. Verificar `cpu-spike` no Top CPU Consumers
+4. Colar saída de `collect-anomaly-context.sh` no Prompt 1 ou 5
+5. Encerrar com `./scripts/stop-all-anomalies.sh`
 
 ---
 
@@ -320,9 +334,13 @@ Gráficos ilustrativos dos slides são **exemplos conceituais**. Durante a grava
 | Script | Função |
 |--------|--------|
 | `./scripts/start-anomaly.sh` | Ativa `cpu-spike` no namespace payments |
-| `./scripts/stop-anomaly.sh` | Remove o workload de anomalia |
+| `./scripts/start-staging-anomaly.sh` | Ativa CronJob `backup-sync` em staging |
+| `./scripts/stop-anomaly.sh` | Remove spike de CPU |
+| `./scripts/stop-staging-anomaly.sh` | Remove anomalia silenciosa |
+| `./scripts/stop-all-anomalies.sh` | Para todas as anomalias |
+| `./scripts/collect-anomaly-context.sh` | Gera bloco de dados para prompts de IA |
 
-Teste ambos **antes** de gravar a Aula 3.
+Teste todos **antes** de gravar a Aula 3. O lab é montado na hora — spikes aparecem em ~30s, staging dispara job imediatamente.
 
 ---
 

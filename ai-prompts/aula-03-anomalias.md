@@ -6,10 +6,27 @@ Detectar anomalias de consumo, explicar causas prováveis, correlacionar spikes 
 
 ## Como usar na gravação
 
-1. Rode `./scripts/start-anomaly.sh` antes da demo para ativar o `cpu-spike` no namespace payments.
-2. Abra o dashboard Grafana e capture o spike de CPU em payments.
-3. Cole o prompt com os dados atualizados (horário do spike, valor de CPU, workload envolvido).
-4. Encerre com `./scripts/stop-anomaly.sh` e mostre o retorno ao baseline.
+O lab é montado na hora — não depende de histórico longo. Use intervalo **Last 15 minutes** no Grafana.
+
+### Spike de CPU (vídeos 3.2 e 3.5)
+
+1. Fluxo recomendado: `./scripts/start-business-hours-load.sh`, aguarde 2 min, `./scripts/start-anomaly.sh`
+2. Abra `finops-ai-anomalies.json` — spike visível em ~30s
+3. Rode `./scripts/collect-anomaly-context.sh` e cole a saída no prompt
+4. Encerre com `./scripts/stop-anomaly.sh`
+
+### Anomalia silenciosa em staging (vídeo 3.4)
+
+1. Rode `./scripts/start-staging-anomaly.sh` — job dispara imediatamente
+2. Verifique `kubectl get jobs -n staging -l app=backup-sync`
+3. Use o **Prompt 4** abaixo
+4. Encerre com `./scripts/stop-staging-anomaly.sh`
+
+### Limpar tudo
+
+```bash
+./scripts/stop-all-anomalies.sh
+```
 
 ---
 
@@ -90,7 +107,7 @@ O namespace staging não teve spike de CPU, mas o custo alocado subiu 22% na úl
 
 Dados:
 - staging-api: 1 réplica, requests 500m CPU / 512 Mi, uso médio 28m CPU
-- Novo CronJob detectado: backup-sync (executa a cada 15 min, pico 400m CPU por 3 min)
+- Novo CronJob detectado: backup-sync (no lab: a cada 2 min; em produção: ~15 min — pico ~400m CPU por ~90s)
 - Labels: team=platform, environment=staging, cost-center=engineering
 - Nenhuma mudança em payments ou users
 
