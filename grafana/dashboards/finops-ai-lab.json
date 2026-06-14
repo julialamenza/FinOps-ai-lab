@@ -1,142 +1,241 @@
 {
-  "title": "FinOps AI Lab",
-  "tags": ["finops", "kubernetes", "ai"],
-  "timezone": "browser",
-  "schemaVersion": 39,
-  "version": 1,
-  "refresh": "10s",
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Dashboard principal do FinOps AI Lab (Aula 1). Lab montado na hora — use Last 15 minutes.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
   "panels": [
+    {
+      "id": 100,
+      "type": "text",
+      "title": "Lab Time Range",
+      "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "## FinOps AI Lab — intervalo de tempo\n\nO cluster local **nao tem historico de dias**. Use **Last 15 minutes** ou **Last 1 hour**.\n\nAntes de gravar: `./scripts/warmup-lab-metrics.sh` (gera ~3 min de metricas).\n\n`Last 7 days` ficara vazio — isso e esperado no lab, nao e erro de configuracao."
+      }
+    },
     {
       "id": 1,
       "type": "stat",
-      "title": "Cluster CPU Usage",
-      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
+      "title": "Cluster CPU Usage (cores)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 3 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[5m]))"
+          "expr": "sum(rate(node_cpu_seconds_total{mode!=\"idle\"}[2m]))",
+          "legendFormat": "CPU cores"
         }
       ],
       "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
+        "reduceOptions": { "calcs": ["lastNotNull"] }
       }
     },
     {
       "id": 2,
       "type": "stat",
       "title": "Cluster Memory Usage (GB)",
-      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 3 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "(node_memory_MemTotal_bytes-node_memory_MemAvailable_bytes)/1024/1024/1024"
+          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / 1024 / 1024 / 1024"
         }
       ],
       "options": {
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
-        }
+        "reduceOptions": { "calcs": ["lastNotNull"] }
       }
     },
-
     {
       "id": 3,
       "type": "gauge",
       "title": "Payments CPU (mCPU)",
-      "gridPos": { "h": 6, "w": 4, "x": 0, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"payments\"}[5m]))*1000"
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"payments\"}[2m])) * 1000"
         }
       ]
     },
-
     {
       "id": 4,
       "type": "gauge",
       "title": "Users CPU (mCPU)",
-      "gridPos": { "h": 6, "w": 4, "x": 4, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"users\"}[5m]))*1000"
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"users\"}[2m])) * 1000"
         }
       ]
     },
-
     {
       "id": 5,
       "type": "gauge",
       "title": "Staging CPU (mCPU)",
-      "gridPos": { "h": 6, "w": 4, "x": 8, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"staging\"}[5m]))*1000"
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=\"staging\"}[2m])) * 1000"
         }
       ]
     },
-
     {
       "id": 6,
       "type": "gauge",
       "title": "Payments Memory (MiB)",
-      "gridPos": { "h": 6, "w": 4, "x": 12, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(container_memory_working_set_bytes{namespace=\"payments\"})/1024/1024"
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"payments\"}) / 1024 / 1024"
         }
       ]
     },
-
     {
       "id": 7,
       "type": "gauge",
       "title": "Users Memory (MiB)",
-      "gridPos": { "h": 6, "w": 4, "x": 16, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(container_memory_working_set_bytes{namespace=\"users\"})/1024/1024"
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"users\"}) / 1024 / 1024"
         }
       ]
     },
-
     {
       "id": 8,
       "type": "gauge",
       "title": "Staging Memory (MiB)",
-      "gridPos": { "h": 6, "w": 4, "x": 20, "y": 5 },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "sum(container_memory_working_set_bytes{namespace=\"staging\"})/1024/1024"
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"staging\"}) / 1024 / 1024"
         }
       ]
     },
-
     {
       "id": 9,
-      "type": "table",
-      "title": "Top CPU Consumers",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 11 },
+      "type": "timeseries",
+      "title": "CPU Usage by Namespace (mCPU)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "showPoints": "never" },
+          "unit": "none"
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
       "targets": [
         {
-          "expr": "topk(10,sum by(namespace,pod)(rate(container_cpu_usage_seconds_total{cpu=\"total\"}[5m]))*1000)",
+          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[2m])) * 1000",
+          "legendFormat": "{{namespace}}"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Memory Usage by Namespace (MiB)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "lineWidth": 1, "fillOpacity": 10, "showPoints": "never" },
+          "unit": "decmbytes"
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (namespace) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024",
+          "legendFormat": "{{namespace}}"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "table",
+      "title": "Top CPU Consumers (mCPU)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[2m])) * 1000)",
           "instant": true,
           "format": "table"
         }
       ]
     },
-
     {
-      "id": 10,
+      "id": 12,
       "type": "table",
-      "title": "Top Memory Consumers",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 11 },
+      "title": "Top Memory Consumers (MiB)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
       "targets": [
         {
-          "expr": "topk(10,sum by(namespace,pod)(container_memory_working_set_bytes)/1024/1024)",
+          "expr": "topk(10, sum by (namespace, pod) (container_memory_working_set_bytes{namespace=~\"payments|users|staging\"}) / 1024 / 1024)",
           "instant": true,
           "format": "table"
         }
       ]
     }
-  ]
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": ["finops", "kubernetes", "ai"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["5m", "15m", "30m", "1h", "2h"]
+  },
+  "timezone": "browser",
+  "title": "FinOps AI Lab",
+  "uid": "finops-ai-lab",
+  "version": 2,
+  "weekStart": ""
 }

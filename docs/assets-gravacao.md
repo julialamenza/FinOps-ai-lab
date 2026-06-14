@@ -71,7 +71,7 @@ Lista de screenshots e assets visuais necessários para o curso, com indicação
 |------------|---------|
 | Prompt colado na ferramenta de IA (antes de enviar) | Hands-on de cada aula (1.5, 2.5, 3.5, 4.5, 5.5) |
 | Resposta da IA com recomendações | Hands-on de cada aula |
-| Prompt mestre da Aula 5 (`aula-05-eficiencia.md` → Prompt 5) | Aula 5 — vídeo 5.5 |
+| Prompt mestre da Aula 5 (`ai-prompts/aula-05/5.5-copiloto-eficiencia.md`) | Aula 5 — vídeo 5.5 |
 
 ---
 

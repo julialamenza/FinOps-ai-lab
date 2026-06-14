@@ -45,11 +45,11 @@ Cronograma operacional para gravar **5 aulas** e **25 vídeos** do curso, usando
 
 | Aula | Tema | Dashboard | Prompt IA |
 |------|------|-----------|-----------|
-| 1 | Observabilidade de custos e comportamento operacional | `grafana/dashboards/finops-ai-lab.json` | `ai-prompts/aula-01-observabilidade.md` |
-| 2 | Rightsizing e eficiência operacional automatizada | `grafana/dashboards/finops-ai-rightsizing.json` | `ai-prompts/aula-02-rightsizing.md` |
-| 3 | Anomalias de custo e capacity planning operacional | `grafana/dashboards/finops-ai-anomalies.json` | `ai-prompts/aula-03-anomalias.md` |
-| 4 | Governança operacional e visibilidade de custos | `grafana/dashboards/finops-ai-governance.json` | `ai-prompts/aula-04-governanca.md` |
-| 5 | Operações cloud orientadas por eficiência | Todos os dashboards anteriores | `ai-prompts/aula-05-eficiencia.md` |
+| 1 | Observabilidade de custos e comportamento operacional | `grafana/dashboards/finops-ai-lab.json` | `ai-prompts/aula-01/` |
+| 2 | Rightsizing e eficiência operacional automatizada | `grafana/dashboards/finops-ai-rightsizing.json` | `ai-prompts/aula-02/` |
+| 3 | Anomalias de custo e capacity planning operacional | `grafana/dashboards/finops-ai-anomalies.json` | `ai-prompts/aula-03/` |
+| 4 | Governança operacional e visibilidade de custos | `grafana/dashboards/finops-ai-governance.json` | `ai-prompts/aula-04/` |
+| 5 | Operações cloud orientadas por eficiência | Todos os dashboards anteriores | `ai-prompts/aula-05/` |
 
 ---
 
@@ -84,7 +84,7 @@ Legenda de dependências: ✅ = necessário | ⬜ = opcional | — = não aplic�
 | 3.1 | Detectando comportamento anormal de consumo | 8–10 | pendente | ✅ | ✅ | — | ✅ | Explicar baseline vs spike |
 | 3.2 | Investigando origem de anomalias operacionais | 10–12 | pendente | ✅ | ✅ | ✅ | ✅ | Preparar `cpu-spike` |
 | 3.3 | Planejamento operacional de capacidade | 10–12 | pendente | ✅ | ✅ | ⬜ | ✅ | Painel Capacity Headroom |
-| 3.4 | Otimizando uso de recursos em cloud | 10–12 | pendente | ✅ | ✅ | ✅ | ✅ | `start-staging-anomaly.sh` + Prompt 4 |
+| 3.4 | Otimizando uso de recursos em cloud | 10–12 | pendente | ✅ | ✅ | ✅ | ✅ | `start-staging-anomaly.sh` + `3.4-anomalia-silenciosa-staging.md` |
 | 3.5 | Hands-on — análise de anomalias e capacidade operacional | 12–15 | pendente | ⬜ | ✅ | ✅ | ✅ | `start-anomaly.sh` + `stop-anomaly.sh` |
 
 ### Aula 4 — Governança operacional e visibilidade de custos
@@ -105,7 +105,7 @@ Legenda de dependências: ✅ = necessário | ⬜ = opcional | — = não aplic�
 | 5.2 | Tomada de decisão orientada por dados operacionais | 10–12 | pendente | ✅ | — | ⬜ | ✅ | Matriz impacto × esforço |
 | 5.3 | Eficiência operacional contínua em ambientes modernos | 10–12 | pendente | ✅ | — | — | ✅ | Plano de 90 dias |
 | 5.4 | Construindo uma cultura operacional orientada por eficiência | 10–12 | pendente | ✅ | — | — | ✅ | Fechamento conceitual |
-| 5.5 | Hands-on — fluxo operacional completo de FinOps com IA | 12–15 | pendente | ⬜ | ✅ | ✅ | ✅ | Prompt mestre (`aula-05-eficiencia.md`) |
+| 5.5 | Hands-on — fluxo operacional completo de FinOps com IA | 12–15 | pendente | ⬜ | ✅ | ✅ | ✅ | `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` |
 
 ---
 
@@ -127,7 +127,8 @@ Atualize esta tabela conforme avançar na gravação.
 
 | Arquivo | Uso |
 |---------|-----|
-| `docs/folha-gravacao.md` | **Folha operacional** — comandos, port-forwards e fluxo por aula/vídeo |
+| `docs/folha-gravacao.md` | **Folha operacional** — consulta rápida durante a gravação |
+| `docs/manual-gravacao-completo.md` | **Manual completo** — roteiro + comandos + prompts (exportar PDF) |
 | `docs/guia-gravacao.md` | Preparação técnica, port-forwards, demos por aula |
 | `docs/roteiro-gravacao.md` | Roteiro detalhado de cada vídeo |
 | `docs/checklist-gravacao.md` | Checklist antes, durante e depois da gravação |

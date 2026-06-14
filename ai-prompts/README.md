@@ -1,10 +1,10 @@
 # Prompts de IA — FinOps com IA
 
-Coleção de prompts reutilizáveis para gravação do curso **FinOps com IA**. Cada arquivo corresponde a uma aula e contém prompts prontos para copiar e colar em ferramentas como ChatGPT, Claude, Cursor ou Copilot.
+Coleção de prompts reutilizáveis para gravação do curso **FinOps com IA**. Cada prompt corresponde a **um vídeo** — abra o arquivo do vídeo que está gravando e copie o bloco completo.
 
 ## Como usar durante o curso
 
-1. **Antes da gravação**, leia o arquivo da aula e identifique qual prompt combina com o momento do roteiro (demo, slide ou discussão).
+1. **Antes da gravação**, abra o prompt do vídeo em `ai-prompts/aula-XX/<video>-*.md` (consulte `docs/roteiro-gravacao.md` ou `docs/folha-gravacao.md`).
 2. **Durante a gravação**, copie o bloco completo do prompt — incluindo os dados de exemplo — e cole na ferramenta de IA escolhida.
 3. **Substitua os dados de exemplo** pelos valores reais coletados no laboratório (Grafana, Prometheus, OpenCost ou `kubectl top`).
 4. **Comente a resposta da IA** em voz alta ou na tela: valide se faz sentido operacionalmente antes de apresentar como conclusão.
@@ -12,15 +12,51 @@ Coleção de prompts reutilizáveis para gravação do curso **FinOps com IA**. 
 
 ---
 
-## Arquivos por aula
+## Estrutura
 
-| Arquivo                      | Tema                                                  |
-| ---------------------------- | ----------------------------------------------------- |
-| `aula-01-observabilidade.md` | Observabilidade de custos e comportamento operacional |
-| `aula-02-rightsizing.md`     | Rightsizing e eficiência operacional automatizada     |
-| `aula-03-anomalias.md`       | Anomalias de custo e capacity planning operacional    |
-| `aula-04-governanca.md`      | Governança operacional e visibilidade de custos       |
-| `aula-05-eficiencia.md`      | Operações cloud orientadas por eficiência             |
+```text
+ai-prompts/
+├── aula-01/          # 5 prompts (vídeos 1.1–1.5)
+├── aula-02/          # 5 prompts (vídeos 2.1–2.5)
+├── aula-03/          # 5 prompts (vídeos 3.1–3.5)
+├── aula-04/          # 5 prompts (vídeos 4.1–4.5)
+├── aula-05/          # 5 prompts (vídeos 5.1–5.5)
+└── aula-0X-*.md      # Índices de compatibilidade (links para aula-0X/)
+```
+
+Cada pasta `aula-XX/` tem um `README.md` com a tabela vídeo → arquivo.
+
+---
+
+## Mapa completo (25 vídeos)
+
+| Vídeo | Arquivo | Tema |
+|-------|---------|------|
+| 1.1 | `aula-01/1.1-narrativa-abertura.md` | Narrativa de abertura |
+| 1.2 | `aula-01/1.2-desperdicios-operacionais.md` | Desperdícios operacionais *(opcional)* |
+| 1.3 | `aula-01/1.3-padroes-sazonalidade.md` | Padrões de uso e sazonalidade |
+| 1.4 | `aula-01/1.4-metricas-essenciais.md` | Métricas essenciais FinOps |
+| 1.5 | `aula-01/1.5-panorama-consumo.md` | Panorama de consumo *(hands-on)* |
+| 2.1 | `aula-02/2.1-business-case-em.md` | Business case para EM |
+| 2.2 | `aula-02/2.2-rightsizing-payments-api.md` | Rightsizing payments-api |
+| 2.3 | `aula-02/2.3-automacao-vpa.md` | Automação e VPA |
+| 2.4 | `aula-02/2.4-comparativo-workloads.md` | Comparativo workloads *(opcional)* |
+| 2.5 | `aula-02/2.5-rightsizing-hands-on.md` | Rightsizing *(hands-on)* |
+| 3.1 | `aula-03/3.1-deteccao-anomalia-cpu.md` | Detecção de anomalia |
+| 3.2 | `aula-03/3.2-investigacao-anomalia-cpu.md` | Investigação com spike ao vivo |
+| 3.3 | `aula-03/3.3-capacity-planning.md` | Capacity planning |
+| 3.4 | `aula-03/3.4-anomalia-silenciosa-staging.md` | Anomalia silenciosa staging |
+| 3.5 | `aula-03/3.5-runbook-anomalias.md` | Runbook *(hands-on)* |
+| 4.1 | `aula-04/4.1-auditoria-labels.md` | Auditoria de labels |
+| 4.2 | `aula-04/4.2-politica-ambientes.md` | Política prod vs staging |
+| 4.3 | `aula-04/4.3-showback-chargeback.md` | Showback vs chargeback |
+| 4.4 | `aula-04/4.4-guardrails.md` | Guardrails |
+| 4.5 | `aula-04/4.5-visibilidade-persona.md` | Visibilidade por persona *(hands-on)* |
+| 5.1 | `aula-05/5.1-diagnostico-consolidado.md` | Diagnóstico consolidado |
+| 5.2 | `aula-05/5.2-priorizacao-matriz.md` | Matriz impacto × esforço |
+| 5.3 | `aula-05/5.3-plano-90-dias.md` | Plano 90 dias |
+| 5.4 | `aula-05/5.4-recomendacoes-executivas.md` | Recomendações executivas |
+| 5.5 | `aula-05/5.5-copiloto-eficiencia.md` | **Prompt mestre** *(hands-on)* |
 
 ---
 

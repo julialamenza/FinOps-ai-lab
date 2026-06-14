@@ -4,13 +4,13 @@ Roteiro detalhado dos **25 vídeos** do curso (5 aulas × 5 vídeos). Cada víde
 
 ## Referência rápida
 
-| Aula | Dashboard | Prompt IA |
-|------|-----------|-----------|
-| 1 | `grafana/dashboards/finops-ai-lab.json` | `ai-prompts/aula-01-observabilidade.md` |
-| 2 | `grafana/dashboards/finops-ai-rightsizing.json` | `ai-prompts/aula-02-rightsizing.md` |
-| 3 | `grafana/dashboards/finops-ai-anomalies.json` | `ai-prompts/aula-03-anomalias.md` |
-| 4 | `grafana/dashboards/finops-ai-governance.json` | `ai-prompts/aula-04-governanca.md` |
-| 5 | Todos os dashboards anteriores | `ai-prompts/aula-05-eficiencia.md` |
+| Aula | Dashboard | Prompts (por vídeo) |
+|------|-----------|---------------------|
+| 1 | `grafana/dashboards/finops-ai-lab.json` | `ai-prompts/aula-01/` |
+| 2 | `grafana/dashboards/finops-ai-rightsizing.json` | `ai-prompts/aula-02/` |
+| 3 | `grafana/dashboards/finops-ai-anomalies.json` | `ai-prompts/aula-03/` |
+| 4 | `grafana/dashboards/finops-ai-governance.json` | `ai-prompts/aula-04/` |
+| 5 | Todos os dashboards anteriores | `ai-prompts/aula-05/` |
 
 ### Notas gerais para todas as aulas
 
@@ -26,7 +26,7 @@ Documentos de apoio: `docs/guia-gravacao.md`, `docs/cronograma-gravacao.md`, `do
 ## Aula 1 — Observabilidade de custos e comportamento operacional
 
 **Dashboard:** `grafana/dashboards/finops-ai-lab.json`
-**Prompts:** `ai-prompts/aula-01-observabilidade.md`
+**Prompts:** `ai-prompts/aula-01/`
 
 ---
 
@@ -44,7 +44,7 @@ Demo:
 Nenhuma.
 
 Prompt IA:
-Prompt 5 — Narrativa para abertura da aula (`aula-01-observabilidade.md`)
+`ai-prompts/aula-01/1.1-narrativa-abertura.md`
 
 Tempo estimado:
 8–10 min
@@ -67,7 +67,7 @@ kubectl get deploy -A
 ```
 
 Prompt IA:
-Prompt 2 — Desperdícios operacionais em ambientes distribuídos (opcional)
+`ai-prompts/aula-01/1.2-desperdicios-operacionais.md` *(opcional)*
 
 Tempo estimado:
 10–12 min
@@ -86,7 +86,7 @@ Demo:
 Abrir Grafana — dashboard `finops-ai-lab.json`. Comentar gauges e painéis de CPU/memória por namespace.
 
 Prompt IA:
-Prompt 3 — Padrões de uso e sazonalidade
+`ai-prompts/aula-01/1.3-padroes-sazonalidade.md`
 
 Tempo estimado:
 10–12 min
@@ -105,7 +105,7 @@ Demo:
 Mencionar Prometheus (`localhost:9090`) e painéis do Grafana. Gráficos de slide como exemplo conceitual.
 
 Prompt IA:
-Prompt 4 — Métricas essenciais para FinOps em Kubernetes
+`ai-prompts/aula-01/1.4-metricas-essenciais.md`
 
 Tempo estimado:
 10–12 min
@@ -131,10 +131,10 @@ kubectl top pods -A
 1. Abrir dashboard `finops-ai-lab.json`
 2. Comentar gauges e Top CPU/Memory Consumers
 3. Comparar dados reais com exemplos dos slides
-4. Colar Prompt 1 — Panorama de consumo por namespace
+4. Colar prompt de `ai-prompts/aula-01/1.5-panorama-consumo.md`
 
 Prompt IA:
-Prompt 1 — Panorama de consumo por namespace
+`ai-prompts/aula-01/1.5-panorama-consumo.md`
 
 Tempo estimado:
 12–15 min
@@ -144,7 +144,7 @@ Tempo estimado:
 ## Aula 2 — Rightsizing e eficiência operacional automatizada
 
 **Dashboard:** `grafana/dashboards/finops-ai-rightsizing.json`
-**Prompts:** `ai-prompts/aula-02-rightsizing.md`
+**Prompts:** `ai-prompts/aula-02/`
 
 ---
 
@@ -160,7 +160,7 @@ Demo:
 Nenhuma. Citar `payments-api` como exemplo do lab.
 
 Prompt IA:
-Prompt 5 — Business case para Engineering Manager
+`ai-prompts/aula-02/2.1-business-case-em.md`
 
 Tempo estimado:
 8–10 min
@@ -179,7 +179,7 @@ Demo:
 Abrir dashboard `finops-ai-rightsizing.json` — painéis CPU/Memory Usage vs Requests.
 
 Prompt IA:
-Prompt 1 — Rightsizing do payments-api
+`ai-prompts/aula-02/2.2-rightsizing-payments-api.md`
 
 Tempo estimado:
 10–12 min
@@ -198,7 +198,7 @@ Demo:
 Conceitual. Mencionar `kubectl describe deployment payments-api -n payments`.
 
 Prompt IA:
-Prompt 4 — Automação e VPA/Recommendation
+`ai-prompts/aula-02/2.3-automacao-vpa.md`
 
 Tempo estimado:
 10–12 min
@@ -217,7 +217,7 @@ Demo:
 Conceitual. Citar `staging-api` como workload subutilizado.
 
 Prompt IA:
-Prompt 2 — Comparativo entre os três workloads (opcional)
+`ai-prompts/aula-02/2.4-comparativo-workloads.md` *(opcional)*
 
 Tempo estimado:
 10–12 min
@@ -242,10 +242,10 @@ kubectl top pods -n payments
 1. Abrir dashboard `finops-ai-rightsizing.json`
 2. Mostrar CPU Waste Percentage e Top Overprovisioned Pods
 3. Destacar candidates payments e staging
-4. Colar Prompt 1 + Prompt 2 e discutir recomendações
+4. Colar prompt de `ai-prompts/aula-02/2.5-rightsizing-hands-on.md` (contém Prompt A + B)
 
 Prompt IA:
-Prompt 1 — Rightsizing do payments-api + Prompt 2 — Comparativo entre workloads
+`ai-prompts/aula-02/2.5-rightsizing-hands-on.md`
 
 Tempo estimado:
 12–15 min
@@ -255,7 +255,7 @@ Tempo estimado:
 ## Aula 3 — Anomalias de custo e capacity planning operacional
 
 **Dashboard:** `grafana/dashboards/finops-ai-anomalies.json`
-**Prompts:** `ai-prompts/aula-03-anomalias.md`
+**Prompts:** `ai-prompts/aula-03/`
 
 ---
 
@@ -271,7 +271,7 @@ Demo:
 Abrir dashboard — Payments CPU Timeline (baseline).
 
 Prompt IA:
-Prompt 1 — Detecção de anomalia de CPU
+`ai-prompts/aula-03/3.1-deteccao-anomalia-cpu.md`
 
 Tempo estimado:
 8–10 min
@@ -296,7 +296,7 @@ kubectl top pods -n payments
 Mostrar spike no CPU Spike Detector. Explicar que `cpu-spike` simula anomalia.
 
 Prompt IA:
-Prompt 1 — Detecção de anomalia de CPU (com dados do spike)
+`ai-prompts/aula-03/3.2-investigacao-anomalia-cpu.md`
 
 Tempo estimado:
 10–12 min
@@ -315,7 +315,7 @@ Demo:
 Painel Capacity Headroom no dashboard anomalies.
 
 Prompt IA:
-Prompt 3 — Capacity planning após incidente
+`ai-prompts/aula-03/3.3-capacity-planning.md`
 
 Tempo estimado:
 10–12 min
@@ -340,7 +340,7 @@ kubectl top pods -n staging
 Mostrar que staging-api está estável, mas jobs `backup-sync` geram rajadas de CPU/custo.
 
 Prompt IA:
-Prompt 4 — Anomalia silenciosa em staging
+`ai-prompts/aula-03/3.4-anomalia-silenciosa-staging.md`
 
 Tempo estimado:
 10–12 min
@@ -369,11 +369,11 @@ sleep 120
 1. Abrir dashboard `finops-ai-anomalies.json` (Last 15 minutes)
 2. Mostrar baseline com business-hours-load, ativar spike, investigar Top CPU Consumers
 3. Verificar Capacity Headroom
-4. Colar saída de `collect-anomaly-context.sh` no Prompt 5 — Runbook de resposta a anomalias
+4. Colar saída de `collect-anomaly-context.sh` em `ai-prompts/aula-03/3.5-runbook-anomalias.md`
 5. Parar anomalias e confirmar retorno ao baseline
 
 Prompt IA:
-Prompt 5 — Runbook de resposta a anomalias
+`ai-prompts/aula-03/3.5-runbook-anomalias.md`
 
 Tempo estimado:
 12–15 min
@@ -383,7 +383,7 @@ Tempo estimado:
 ## Aula 4 — Governança operacional e visibilidade de custos
 
 **Dashboard:** `grafana/dashboards/finops-ai-governance.json`
-**Prompts:** `ai-prompts/aula-04-governanca.md`
+**Prompts:** `ai-prompts/aula-04/`
 
 ---
 
@@ -401,7 +401,7 @@ kubectl get ns --show-labels
 ```
 
 Prompt IA:
-Prompt 1 — Auditoria de labels e ownership
+`ai-prompts/aula-04/4.1-auditoria-labels.md`
 
 Tempo estimado:
 8–10 min
@@ -420,7 +420,7 @@ Demo:
 Painel Governance Matrix no dashboard governance.
 
 Prompt IA:
-Prompt 5 — Política de ambientes (prod vs. staging)
+`ai-prompts/aula-04/4.2-politica-ambientes.md`
 
 Tempo estimado:
 10–12 min
@@ -440,7 +440,7 @@ Painel Showback View no dashboard. Abrir **OpenCost** (`localhost:9003`) — fer
 *(Opcional)* Screenshot AWS Cost Explorer como complemento visual.
 
 Prompt IA:
-Prompt 2 — Showback vs. chargeback
+`ai-prompts/aula-04/4.3-showback-chargeback.md`
 
 Tempo estimado:
 10–12 min
@@ -459,7 +459,7 @@ Demo:
 Painel Guardrails Checklist no dashboard governance.
 
 Prompt IA:
-Prompt 3 — Guardrails sem atrito
+`ai-prompts/aula-04/4.4-guardrails.md`
 
 Tempo estimado:
 10–12 min
@@ -484,11 +484,11 @@ kubectl get ns --show-labels
 1. Abrir dashboard `finops-ai-governance.json`
 2. Percorrer Governance Matrix, Showback View, Guardrails
 3. Abrir OpenCost — custo por namespace/workload
-4. Colar Prompt 4 — Visibilidade por persona
+4. Colar prompt de `ai-prompts/aula-04/4.5-visibilidade-persona.md`
 5. *(Opcional)* Comparar com screenshot AWS Cost Explorer
 
 Prompt IA:
-Prompt 4 — Visibilidade por persona
+`ai-prompts/aula-04/4.5-visibilidade-persona.md`
 
 Tempo estimado:
 12–15 min
@@ -498,7 +498,7 @@ Tempo estimado:
 ## Aula 5 — Operações cloud orientadas por eficiência
 
 **Dashboards:** todos os anteriores
-**Prompts:** `ai-prompts/aula-05-eficiencia.md`
+**Prompts:** `ai-prompts/aula-05/`
 
 ---
 
@@ -514,7 +514,7 @@ Demo:
 Visão rápida dos dashboards das aulas 1–4 no Grafana.
 
 Prompt IA:
-Prompt 1 — Diagnóstico consolidado do laboratório
+`ai-prompts/aula-05/5.1-diagnostico-consolidado.md`
 
 Tempo estimado:
 8–10 min
@@ -533,7 +533,7 @@ Demo:
 Conceitual. Resumir achados do lab em tabela.
 
 Prompt IA:
-Prompt 3 — Priorização por matriz impacto × esforço
+`ai-prompts/aula-05/5.2-priorizacao-matriz.md`
 
 Tempo estimado:
 10–12 min
@@ -552,7 +552,7 @@ Demo:
 Nenhuma. *(Opcional)* Screenshot AWS Cost Explorer forecast.
 
 Prompt IA:
-Prompt 2 — Plano de otimização contínua (90 dias)
+`ai-prompts/aula-05/5.3-plano-90-dias.md`
 
 Tempo estimado:
 10–12 min
@@ -571,7 +571,7 @@ Demo:
 Nenhuma.
 
 Prompt IA:
-Prompt 4 — Recomendações executivas (CTO / VP Engineering)
+`ai-prompts/aula-05/5.4-recomendacoes-executivas.md`
 
 Tempo estimado:
 10–12 min
@@ -596,11 +596,11 @@ kubectl top pods -A
 1. Percorrer os 4 dashboards (resumo de 1 min cada)
 2. Resumir achados: payments overprovisionado, users saudável, staging subutilizado, cpu-spike como lição
 3. Abrir OpenCost para visão consolidada
-4. Colar **Prompt 5 — Copiloto de eficiência (prompt mestre)**
+4. Colar prompt de `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` (prompt mestre)
 5. Apresentar plano de 90 dias e KPIs da resposta
 
 Prompt IA:
-**Prompt 5 — Copiloto de eficiência — prompt mestre reutilizável**
+`ai-prompts/aula-05/5.5-copiloto-eficiencia.md`
 
 Tempo estimado:
 12–15 min

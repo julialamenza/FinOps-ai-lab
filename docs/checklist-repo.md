@@ -25,6 +25,8 @@
 - [x] deploy-lab.sh
 - [x] cleanup-lab.sh
 - [x] install-opencost.sh
+- [x] warmup-lab-metrics.sh
+- [x] helm/opencost-values.yaml
 - [x] start-anomaly.sh
 - [x] stop-anomaly.sh
 - [x] start-staging-anomaly.sh

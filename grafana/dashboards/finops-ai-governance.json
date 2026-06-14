@@ -43,7 +43,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m])) * 1000",
+          "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[2m])) * 1000",
           "legendFormat": "{{namespace}}",
           "refId": "A"
         }
@@ -285,8 +285,11 @@
       }
     ]
   },
-  "time": { "from": "now-1h", "to": "now" },
-  "timepicker": {},
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["5m", "15m", "30m", "1h", "2h"]
+  },
   "timezone": "browser",
   "title": "FinOps AI - Governance and Cost Visibility",
   "uid": "finops-ai-governance",

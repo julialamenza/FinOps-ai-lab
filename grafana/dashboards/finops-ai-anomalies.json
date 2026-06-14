@@ -266,7 +266,7 @@
         },
         {
           "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[5m]))",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{cpu=\"total\",namespace=~\"payments|users|staging\"}[2m]))",
           "legendFormat": "CPU Usage Total (cores)",
           "refId": "C"
         }
@@ -288,7 +288,7 @@
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
       "options": {
         "mode": "markdown",
-        "content": "## Capacity Planning — Notas Didáticas\n\n### Limitações do laboratório local\n\n- **Sem histórico real de 30 dias** — o Minikube reinicia e não persiste métricas de longo prazo.\n- **Projeções são didáticas** — gráficos de forecast aqui ilustram o *processo*, não previsões reais.\n- **Baseline curta** — use a janela de 1h deste dashboard como \"baseline\" temporária.\n\n### Processo que você deve aprender\n\n1. **Detectar** — identificar desvio (spike, trend, threshold breach)\n2. **Investigar** — correlacionar com deploys, pods, eventos\n3. **Correlacionar** — cruzar métricas (CPU, memória, status, logs)\n4. **Planejar** — decidir: scale up, rightsizing, quota, ou aceitar o risco\n\n> Em produção: CloudWatch, Datadog ou Prometheus com retention de 90+ dias + forecasting (Prophet, linear regression)."
+        "content": "## Capacity Planning — Notas Didáticas\n\n### Limitações do laboratório local\n\n- **Sem histórico real de 30 dias** — o Minikube reinicia e não persiste métricas de longo prazo.\n- **Projeções são didáticas** — gráficos de forecast aqui ilustram o *processo*, não previsões reais.\n- **Baseline curta** — use **Last 15 minutes** neste dashboard. Rode `./scripts/warmup-lab-metrics.sh` antes de gravar.\n\n### Processo que você deve aprender\n\n1. **Detectar** — identificar desvio (spike, trend, threshold breach)\n2. **Investigar** — correlacionar com deploys, pods, eventos\n3. **Correlacionar** — cruzar métricas (CPU, memória, status, logs)\n4. **Planejar** — decidir: scale up, rightsizing, quota, ou aceitar o risco\n\n> Em produção: CloudWatch, Datadog ou Prometheus com retention de 90+ dias + forecasting (Prophet, linear regression)."
       }
     },
     {
@@ -324,8 +324,11 @@
       }
     ]
   },
-  "time": { "from": "now-1h", "to": "now" },
-  "timepicker": {},
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["5m", "15m", "30m", "1h", "2h"]
+  },
   "timezone": "browser",
   "title": "FinOps AI - Anomalies and Capacity Planning",
   "uid": "finops-ai-anomalies",

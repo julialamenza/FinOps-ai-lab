@@ -19,6 +19,7 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] Grafana acessível via port-forward (`localhost:3000`)
 - [ ] OpenCost instalado (`kubectl get pods -n opencost`)
 - [ ] Workloads do lab rodando (`kubectl get deploy -A | grep -E 'payments|users|staging'`)
+- [ ] `./scripts/warmup-lab-metrics.sh` executado (metricas nos dashboards)
 - [ ] Anomalias **desativadas** (`./scripts/stop-all-anomalies.sh` executado)
 
 ### Dashboards
@@ -32,9 +33,9 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 
 ### Materiais de apoio
 
-- [ ] Prompts da aula abertos (`ai-prompts/aula-0X-*.md`)
+- [ ] Prompt do vídeo aberto (`ai-prompts/aula-XX/<video>-*.md`)
 - [ ] Slides da aula abertos e revisados
-- [ ] `docs/folha-gravacao.md` aberto (comandos, port-forwards, fluxo por vídeo)
+- [ ] `docs/folha-gravacao.md` ou PDF `docs/manual-gravacao-completo.pdf` aberto
 - [ ] `docs/roteiro-gravacao.md` aberto para consulta
 - [ ] `docs/guia-gravacao.md` consultado para comandos da demo
 
@@ -60,14 +61,14 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] `kubectl get ns --show-labels` testado
 - [ ] `kubectl get deploy -A` testado
 - [ ] `kubectl top pods -A` retorna métricas
-- [ ] Prompt de `ai-prompts/aula-01-observabilidade.md` revisado
+- [ ] Prompts da Aula 1 revisados (`ai-prompts/aula-01/`)
 
 ### Aula 2 — Rightsizing
 
 - [ ] Dashboard rightsizing (`finops-ai-rightsizing.json`) importado e com dados
 - [ ] Painel CPU Waste Percentage mostra payments com waste alto
 - [ ] `kubectl describe deployment payments-api -n payments` testado
-- [ ] Prompt de `ai-prompts/aula-02-rightsizing.md` revisado
+- [ ] Prompts da Aula 2 revisados (`ai-prompts/aula-02/`)
 
 ### Aula 3 — Anomalias
 
@@ -76,21 +77,21 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] `./scripts/start-staging-anomaly.sh` testado — job `backup-sync` criado imediatamente
 - [ ] `./scripts/stop-all-anomalies.sh` testado — baseline restaurado
 - [ ] `./scripts/collect-anomaly-context.sh` testado — saída utilizável nos prompts
-- [ ] Prompt de `ai-prompts/aula-03-anomalias.md` revisado
+- [ ] Prompts da Aula 3 revisados (`ai-prompts/aula-03/`)
 
 ### Aula 4 — Governança
 
 - [ ] Dashboard governance (`finops-ai-governance.json`) importado e com dados
 - [ ] Port-forward do OpenCost ativo (`localhost:9003`)
 - [ ] `kubectl get ns --show-labels` mostra labels team, environment, cost-center
-- [ ] Prompt de `ai-prompts/aula-04-governanca.md` revisado
+- [ ] Prompts da Aula 4 revisados (`ai-prompts/aula-04/`)
 - [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
 
 ### Aula 5 — Eficiência operacional
 
 - [ ] Todos os 4 dashboards acessíveis no Grafana
 - [ ] Port-forwards Grafana + OpenCost ativos
-- [ ] **Prompt mestre** revisado (`ai-prompts/aula-05-eficiencia.md` → Prompt 5)
+- [ ] **Prompt mestre** revisado (`ai-prompts/aula-05/5.5-copiloto-eficiencia.md`)
 - [ ] Achados das aulas 1–4 anotados para o fluxo completo
 - [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
 

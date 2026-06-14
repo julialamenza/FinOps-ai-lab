@@ -1,0 +1,23 @@
+# Valores do OpenCost para o FinOps AI Lab.
+# Prometheus externo = kube-prometheus-stack no namespace monitoring.
+
+opencost:
+  prometheus:
+    internal:
+      enabled: false
+    external:
+      enabled: true
+      url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+
+  # Precos didaticos para o lab exibir custos imediatamente (USD/hora).
+  customPricing:
+    enabled: true
+    costModel:
+      description: FinOps AI Lab - precos didaticos
+      CPU: 0.031611
+      RAM: 0.004237
+      GPU: 0.95
+      storage: 0.000054
+
+  exporter:
+    defaultClusterId: finops-ai-lab

@@ -150,6 +150,14 @@ kubectl get deploy -A
 kubectl get ns --show-labels
 ```
 
+Gere métricas para os dashboards (lab fresco — ~3 min):
+
+```bash
+./scripts/warmup-lab-metrics.sh
+```
+
+> O cluster local **não tem histórico de dias**. Use **Last 15 minutes** no Grafana e **Today** no OpenCost. `Last 7 days` ficará vazio — comportamento esperado.
+
 ---
 
 ### 5. Importar os dashboards no Grafana
@@ -182,7 +190,7 @@ Importe cada JSON (Dashboards → New → Import → Upload JSON → datasource 
 | Anomalies | `grafana/dashboards/finops-ai-anomalies.json` | 3 |
 | Governance | `grafana/dashboards/finops-ai-governance.json` | 4 |
 
-> O lab é montado na hora da gravação. Use intervalo **Last 15 minutes** nos dashboards — não é necessário histórico longo.
+> O lab é montado na hora da gravação. Rode `./scripts/warmup-lab-metrics.sh` e use **Last 15 minutes** nos dashboards. Se já importou dashboards antes, **reimporte** os JSONs após atualizações.
 
 ---
 
@@ -350,6 +358,8 @@ Utilize principalmente:
 * Namespace Costs
 * Workload Costs
 
+No OpenCost, use a janela **Today** ou **Last 24h**. Aguarde 2–3 min após `warmup-lab-metrics.sh` para os primeiros valores aparecerem.
+
 ---
 
 ## IA no laboratório
@@ -472,8 +482,11 @@ finops-ai-lab/
 │   ├── stop-all-anomalies.sh
 │   ├── collect-anomaly-context.sh
 │   ├── collect-lab-context.sh
+│   ├── warmup-lab-metrics.sh
 │   ├── start-business-hours-load.sh
 │   └── stop-business-hours-load.sh
+├── helm/
+│   └── opencost-values.yaml
 └── README.md
 ```
 
@@ -481,19 +494,17 @@ finops-ai-lab/
 
 ## Documentação do curso
 
-* docs/folha-gravacao.md — **folha operacional para gravar** (comandos, port-forwards, fluxo por aula)
+* docs/folha-gravacao.md — **folha operacional rápida** (comandos, port-forwards)
+* docs/manual-gravacao-completo.md — **manual completo** (roteiro + prompts dos 25 vídeos, exportável em PDF)
 * docs/cronograma-curso.md
 * docs/roteiro-gravacao.md
 * docs/checklist-repo.md
 
-Prompts de IA:
+Prompts de IA (um arquivo por vídeo):
 
 * ai-prompts/README.md
-* ai-prompts/aula-01-observabilidade.md
-* ai-prompts/aula-02-rightsizing.md
-* ai-prompts/aula-03-anomalias.md
-* ai-prompts/aula-04-governanca.md
-* ai-prompts/aula-05-eficiencia.md
+* ai-prompts/aula-01/ … ai-prompts/aula-05/ (25 prompts, ex.: `aula-01/1.1-narrativa-abertura.md`)
+* ai-prompts/aula-0X-*.md — índices de compatibilidade
 
 ---
 

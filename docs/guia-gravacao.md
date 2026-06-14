@@ -13,7 +13,10 @@ Guia operacional para preparar o ambiente, configurar a tela e executar as demos
 minikube start --cpus=4 --memory=8192
 ./scripts/deploy-lab.sh
 ./scripts/install-opencost.sh
+./scripts/warmup-lab-metrics.sh
 ```
+
+> Lab fresco: use **Last 15 minutes** no Grafana e **Today** no OpenCost. `Last 7 days` ficará vazio.
 
 ### 2. Importar dashboards no Grafana
 
@@ -32,7 +35,10 @@ Selecione o datasource **Prometheus** em cada import.
 
 | Material | Caminho |
 |----------|---------|
-| Prompts IA | `ai-prompts/aula-0X-*.md` (um por aula) |
+| **Manual completo (PDF)** | `docs/manual-gravacao-completo.pdf` — gerar com `./scripts/export-manual-gravacao-pdf.sh` |
+| Manual completo (fonte) | `docs/manual-gravacao-completo.md` |
+| Folha rápida | `docs/folha-gravacao.md` |
+| Prompts IA (por vídeo) | `ai-prompts/aula-XX/<video>-*.md` |
 | Roteiro detalhado | `docs/roteiro-gravacao.md` |
 | Checklist | `docs/checklist-gravacao.md` |
 | Slides | Apresentação Gamma/PPT da aula correspondente |
@@ -180,15 +186,17 @@ Se algum pod estiver em `CrashLoopBackOff` ou `Pending`, resolva antes de gravar
 
 ---
 
-## Mapeamento: prompts IA por aula
+## Mapeamento: prompts IA por vídeo
 
-| Aula | Arquivo de prompts | Prompts principais por vídeo |
-|------|-------------------|------------------------------|
-| 1 | `ai-prompts/aula-01-observabilidade.md` | 1.1 → Prompt 5 (narrativa); 1.3 → Prompt 3; 1.4 → Prompt 4; 1.5 → Prompt 1 |
-| 2 | `ai-prompts/aula-02-rightsizing.md` | 2.1 → Prompt 5; 2.2 → Prompt 1; 2.3 → Prompt 4; 2.5 → Prompt 1 + 2 |
-| 3 | `ai-prompts/aula-03-anomalias.md` | 3.1 → Prompt 1; 3.2 → Prompt 1; 3.3 → Prompt 3; 3.5 → Prompt 5 |
-| 4 | `ai-prompts/aula-04-governanca.md` | 4.1 → Prompt 1; 4.3 → Prompt 2; 4.4 → Prompt 3; 4.5 → Prompt 4 |
-| 5 | `ai-prompts/aula-05-eficiencia.md` | 5.1 → Prompt 1; 5.2 → Prompt 3; 5.3 → Prompt 2; 5.5 → **Prompt 5 (mestre)** |
+Cada vídeo tem um arquivo dedicado em `ai-prompts/aula-XX/`. Consulte `ai-prompts/README.md` para o mapa completo ou abra diretamente pelo número do vídeo (ex.: `ai-prompts/aula-01/1.1-narrativa-abertura.md`).
+
+| Aula | Pasta | Exemplos |
+|------|-------|----------|
+| 1 | `ai-prompts/aula-01/` | 1.1 → `1.1-narrativa-abertura.md`; 1.5 → `1.5-panorama-consumo.md` |
+| 2 | `ai-prompts/aula-02/` | 2.1 → `2.1-business-case-em.md`; 2.5 → `2.5-rightsizing-hands-on.md` |
+| 3 | `ai-prompts/aula-03/` | 3.2 → `3.2-investigacao-anomalia-cpu.md`; 3.5 → `3.5-runbook-anomalias.md` |
+| 4 | `ai-prompts/aula-04/` | 4.3 → `4.3-showback-chargeback.md`; 4.5 → `4.5-visibilidade-persona.md` |
+| 5 | `ai-prompts/aula-05/` | 5.5 → `5.5-copiloto-eficiencia.md` *(prompt mestre)* |
 
 > Substitua os dados de exemplo nos prompts pelos valores reais coletados no Grafana ou `kubectl top` durante a gravação.
 
@@ -212,7 +220,7 @@ sleep 120
 1. Abrir dashboard `finops-ai-lab.json` (intervalo **Last 15 minutes**)
 2. Comentar gauges de CPU/memória por namespace
 3. Mostrar Top CPU/Memory Consumers
-4. Colar Prompt 1 de `aula-01-observabilidade.md` na IA
+4. Colar prompt de `ai-prompts/aula-01/1.5-panorama-consumo.md` na IA
 5. Comparar resposta da IA com dados reais do Grafana
 
 ---
@@ -233,7 +241,7 @@ kubectl top pods -n payments
 2. Mostrar CPU Waste Percentage (payments deve estar alto)
 3. Abrir tabela Top CPU Overprovisioned Pods
 4. Destacar Rightsizing Candidates (payments, staging)
-5. Colar Prompt 1 de `aula-02-rightsizing.md` e discutir recomendações
+5. Colar prompt de `ai-prompts/aula-02/2.5-rightsizing-hands-on.md` e discutir recomendações
 
 ---
 
@@ -251,7 +259,7 @@ kubectl top pods -n staging
 
 1. Abrir `finops-ai-anomalies.json` (intervalo Last 15 minutes)
 2. Mostrar que staging-api está estável, mas jobs de `backup-sync` consomem CPU
-3. Colar **Prompt 4** de `aula-03-anomalias.md`
+3. Colar prompt de `ai-prompts/aula-03/3.4-anomalia-silenciosa-staging.md`
 4. Encerrar com `./scripts/stop-staging-anomaly.sh`
 
 **Vídeo 3.5 — Hands-on:**
@@ -267,7 +275,7 @@ sleep 120
 1. Abrir dashboard `finops-ai-anomalies.json`
 2. Mostrar spike no CPU Spike Detector (~30s após start-anomaly)
 3. Verificar `cpu-spike` no Top CPU Consumers
-4. Colar saída de `collect-anomaly-context.sh` no Prompt 1 ou 5
+4. Colar saída de `collect-anomaly-context.sh` em `ai-prompts/aula-03/3.5-runbook-anomalias.md`
 5. Encerrar com `./scripts/stop-all-anomalies.sh`
 
 ---
@@ -288,7 +296,7 @@ kubectl get ns --show-labels
 2. Mostrar Governance Matrix e Label Coverage
 3. Abrir Showback View by Namespace (proxy didático)
 4. Abrir OpenCost em `http://localhost:9003` — **ferramenta principal do lab**
-5. Colar Prompt 2 de `aula-04-governanca.md` (showback vs chargeback)
+5. Colar prompt de `ai-prompts/aula-04/4.3-showback-chargeback.md` (showback vs chargeback)
 6. *(Opcional)* Mostrar screenshot do AWS Cost Explorer como complemento visual
 
 ---
@@ -308,7 +316,7 @@ kubectl top pods -A
 1. Percorrer rapidamente os 4 dashboards (1 min cada)
 2. Resumir achados: over-provisioning (Aula 2), anomalia (Aula 3), governança (Aula 4)
 3. Abrir OpenCost para visão consolidada de custo
-4. Colar **Prompt 5 (mestre)** de `aula-05-eficiencia.md`
+4. Colar prompt de `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` (prompt mestre)
 5. Apresentar plano de 90 dias e KPIs da resposta da IA
 
 ---

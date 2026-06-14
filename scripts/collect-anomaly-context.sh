@@ -50,5 +50,5 @@ kubectl top pods -n users 2>/dev/null || echo "(sem métricas)"
 cat <<EOF
 
 ---
-Dica: use com os prompts em ai-prompts/aula-03-anomalias.md
+Dica: use com os prompts em ai-prompts/aula-03/ (ex.: 3.2-investigacao-anomalia-cpu.md, 3.5-runbook-anomalias.md)
 EOF
