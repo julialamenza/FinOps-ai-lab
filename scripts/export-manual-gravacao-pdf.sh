@@ -7,8 +7,8 @@ MD="docs/manual-gravacao-completo.md"
 PDF="docs/manual-gravacao-completo.pdf"
 
 if [[ ! -f "$MD" ]]; then
-  echo "Gerando manual..."
-  ./scripts/generate-manual-gravacao.sh
+  echo "Erro: $MD não encontrado."
+  exit 1
 fi
 
 if ! command -v pandoc >/dev/null 2>&1; then

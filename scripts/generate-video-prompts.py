@@ -545,7 +545,7 @@ def render(aula, video, slug, title, optional, before, prompt):
     return f"""# Vídeo {video} — {title}{opt}
 
 **Aula {int(aula)}** — {AULA_TITLES[aula]}  
-**Roteiro:** `docs/roteiro-gravacao.md` → Vídeo {video}  
+**Roteiro:** `docs/manual-gravacao-completo.md` → Vídeo {video}  
 **Dashboard:** {AULA_DASHBOARDS[aula]}
 
 ## Antes de colar

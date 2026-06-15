@@ -4,11 +4,9 @@ Coleção de prompts reutilizáveis para gravação do curso **FinOps com IA**. 
 
 ## Como usar durante o curso
 
-1. **Antes da gravação**, abra o prompt do vídeo em `ai-prompts/aula-XX/<video>-*.md` (consulte `docs/roteiro-gravacao.md` ou `docs/folha-gravacao.md`).
-2. **Durante a gravação**, copie o bloco completo do prompt — incluindo os dados de exemplo — e cole na ferramenta de IA escolhida.
-3. **Substitua os dados de exemplo** pelos valores reais coletados no laboratório (Grafana, Prometheus, OpenCost ou `kubectl top`).
-4. **Comente a resposta da IA** em voz alta ou na tela: valide se faz sentido operacionalmente antes de apresentar como conclusão.
-5. **Salve respostas úteis** como referência para a aula seguinte ou para montar dashboards e runbooks.
+**Na gravação**, use só `docs/manual-gravacao-completo.md` (ou o PDF). Cada vídeo já traz slides, comandos, o que mostrar e o prompt completo.
+
+A pasta `ai-prompts/` é opcional — serve para editar prompts fora do manual, se preferir.
 
 ---
 

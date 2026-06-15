@@ -460,7 +460,8 @@ minikube stop
 ```text
 finops-ai-lab/
 ├── ai-prompts/              # Prompts utilizados nas aulas
-├── docs/                    # Cronograma, roteiro e checklist
+├── docs/
+│   └── manual-gravacao-completo.md
 ├── grafana/
 │   └── dashboards/
 │       ├── finops-ai-lab.json
@@ -494,17 +495,11 @@ finops-ai-lab/
 
 ## Documentação do curso
 
-* docs/folha-gravacao.md — **folha operacional rápida** (comandos, port-forwards)
-* docs/manual-gravacao-completo.md — **manual completo** (roteiro + prompts dos 25 vídeos, exportável em PDF)
-* docs/cronograma-curso.md
-* docs/roteiro-gravacao.md
-* docs/checklist-repo.md
+**Na gravação**, abra apenas:
 
-Prompts de IA (um arquivo por vídeo):
+* `docs/manual-gravacao-completo.md` — ou o PDF (`./scripts/export-manual-gravacao-pdf.sh`)
 
-* ai-prompts/README.md
-* ai-prompts/aula-01/ … ai-prompts/aula-05/ (25 prompts, ex.: `aula-01/1.1-narrativa-abertura.md`)
-* ai-prompts/aula-0X-*.md — índices de compatibilidade
+A pasta `ai-prompts/` guarda os prompts por vídeo (útil para editar texto fora do manual); não é necessário abrir durante a gravação.
 
 ---
 

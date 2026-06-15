@@ -1,6 +1,6 @@
 ---
 title: FinOps com IA — Manual Completo de Gravação
-subtitle: Roteiro, comandos e prompts dos 25 vídeos
+subtitle: Setup, roteiro, comandos, prompts e checklist dos 25 vídeos
 lang: pt-BR
 geometry: margin=2cm
 fontsize: 11pt
@@ -11,11 +11,9 @@ toc-depth: 2
 
 # FinOps com IA — Manual Completo de Gravação
 
-Documento consolidado para gravação do curso: **setup do lab**, **roteiro dos 25 vídeos**, **comandos** e **prompts completos** prontos para copiar.
+Documento **único** para gravação do curso: setup, slides, o que mostrar, comandos, prompts e checklist.
 
-> **Exportar PDF:** `./scripts/export-manual-gravacao-pdf.sh`
->
-> **Regenerar este arquivo** após editar roteiro ou prompts: `./scripts/generate-manual-gravacao.sh`
+> **Exportar PDF (opcional):** `./scripts/export-manual-gravacao-pdf.sh`
 
 > O lab é montado **na hora**. Use **Last 15 minutes** em todos os dashboards Grafana.
 
@@ -23,131 +21,42 @@ Documento consolidado para gravação do curso: **setup do lab**, **roteiro dos 
 
 ## Parte 1 — Preparação e setup
 
-## 1. Setup global (início de cada dia de gravação)
-
-Execute na raiz do repositório:
+### Setup global (início de cada dia)
 
 ```bash
-cd /caminho/para/finops-ai-lab
-
 minikube start --cpus=4 --memory=8192
-kubectl cluster-info
-
-chmod +x scripts/*.sh
 ./scripts/deploy-lab.sh
 ./scripts/install-opencost.sh
-
-# Estado limpo — sem anomalias ativas
 ./scripts/stop-all-anomalies.sh
-
-# Gerar metricas (~3 min) — OBRIGATORIO no lab fresco
 ./scripts/warmup-lab-metrics.sh
-
-# Validar
-kubectl get pods -n monitoring
-kubectl get pods -n opencost
-kubectl get deploy -A | grep -E 'payments|users|staging'
-kubectl top pods -A
 ```
 
-> **Grafana:** Last 15 minutes | **OpenCost:** Today ou Last 24h | **NAO** use Last 7 days (sem historico no Minikube).
+### Port-forwards
 
-### Importar dashboards (primeira vez ou cluster novo)
+| Serviço | Comando | URL |
+|---------|---------|-----|
+| Grafana | `kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80` | http://localhost:3000 |
+| Prometheus | `kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090` | http://localhost:9090 |
+| OpenCost | `kubectl port-forward -n opencost svc/opencost 9003:9090` | http://localhost:9003 |
 
-Grafana → Dashboards → Import → Upload JSON → datasource **Prometheus**:
+### Referência rápida por aula
 
-| Dashboard | Arquivo |
-|-----------|---------|
-| Aula 1 | `grafana/dashboards/finops-ai-lab.json` |
-| Aula 2 | `grafana/dashboards/finops-ai-rightsizing.json` |
-| Aula 3 | `grafana/dashboards/finops-ai-anomalies.json` |
-| Aula 4 | `grafana/dashboards/finops-ai-governance.json` |
+| Aula | Dashboard | Port-forwards |
+|------|-----------|---------------|
+| 1 | `grafana/dashboards/finops-ai-lab.json` | Grafana (vídeos 1.3+) |
+| 2 | `grafana/dashboards/finops-ai-rightsizing.json` | Grafana (vídeos 2.2, 2.5) |
+| 3 | `grafana/dashboards/finops-ai-anomalies.json` | Grafana (todos) |
+| 4 | `grafana/dashboards/finops-ai-governance.json` | Grafana (4.2+) + OpenCost (4.3, 4.5) |
+| 5 | `Todos os dashboards anteriores` | Grafana (5.1, 5.5) + OpenCost (5.5) |
 
----
-
-## 2. Port-forwards e acessos (copiar e colar)
-
-Abra **um terminal por port-forward** e deixe rodando durante a sessão.
-
-### Terminal A — Grafana
-
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-```
-
-| Campo | Valor |
-|-------|-------|
-| URL | http://localhost:3000 |
-| Usuário | `admin` |
-| Senha | ver comando abaixo |
-
-```bash
-kubectl get secret -n monitoring monitoring-grafana \
-  -o jsonpath="{.data.admin-password}" | base64 -d && echo
-```
-
-### Terminal B — Prometheus
-
-```bash
-kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090
-```
-
-| Campo | Valor |
-|-------|-------|
-| URL | http://localhost:9090 |
-
-### Terminal C — OpenCost
-
-```bash
-kubectl port-forward -n opencost svc/opencost 9003:9090
-```
-
-| Campo | Valor |
-|-------|-------|
-| URL | http://localhost:9003 |
-| Uso principal | Allocation, Namespace Costs, Workload Costs |
-
-### Quais port-forwards abrir por aula
-
-| Aula | Grafana | Prometheus | OpenCost |
-|------|---------|------------|----------|
-| 1 | ✅ (1.3, 1.4, 1.5) | ⬜ opcional (1.4) | — |
-| 2 | ✅ (2.2, 2.5) | — | — |
-| 3 | ✅ (3.1–3.5) | — | — |
-| 4 | ✅ (4.2–4.5) | — | ✅ (4.3, 4.5) |
-| 5 | ✅ (5.1, 5.5) | — | ✅ (5.5) |
-
----
-
-## 3. Scripts úteis (referência rápida)
-
-```bash
-# Carga por horário comercial (Aula 1 — aguarde 2–3 min)
-./scripts/start-business-hours-load.sh
-./scripts/stop-business-hours-load.sh
-
-# Coleta de dados para prompts de IA
-./scripts/collect-lab-context.sh          # Aulas 1, 2, 4, 5
-./scripts/collect-anomaly-context.sh      # Aula 3
-
-# Anomalias (Aula 3)
-./scripts/start-anomaly.sh                # spike CPU (~30s para aparecer)
-./scripts/start-anomaly.sh --duration 180
-./scripts/start-staging-anomaly.sh        # CronJob backup-sync (job imediato)
-./scripts/stop-all-anomalies.sh           # limpar tudo
-```
-
----
-
-## 4. Legenda dos tipos de vídeo
+### Legenda de tipos
 
 | Tipo | Significado |
 |------|-------------|
-| **T** | Teoria pura — slides + prompt IA, sem lab |
+| **T** | Teoria — slides + prompt IA, sem lab |
 | **T+** | Teoria + demo leve — kubectl ou dashboard estático |
 | **T++** | Teoria + demo ativa — scripts, spikes, jobs |
 | **H** | Hands-on — demo completa (vídeo X.5) |
-
 
 ---
 
@@ -155,7 +64,7 @@ kubectl port-forward -n opencost svc/opencost 9003:9090
 
 ## Aula 1 — Observabilidade de custos e comportamento operacional
 
-**Dashboard:** `finops-ai-lab.json` | **Prompts:** `ai-prompts/aula-01/`
+**Dashboard:** `grafana/dashboards/finops-ai-lab.json` | **Port-forwards:** Grafana (vídeos 1.3+)
 
 ### Vídeo 1.1 — O desafio da eficiência operacional em cloud
 
@@ -163,8 +72,8 @@ kubectl port-forward -n opencost svc/opencost 9003:9090
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `finops-ai-lab.json` |
-| Notas | Slides. Sem terminal. |
+| Dashboard | `grafana/dashboards/finops-ai-lab.json` |
+| Prompt | `ai-prompts/aula-01/1.1-narrativa-abertura.md` |
 
 **Objetivo:** Explicar por que ambientes distribuídos aumentam complexidade operacional e dificultam controle de custos.
 
@@ -172,6 +81,11 @@ kubectl port-forward -n opencost svc/opencost 9003:9090
 - Slide 1: Introdução
 - Slide 2: O desafio da eficiência operacional em cloud
 - Slide 3: Crescimento da complexidade
+
+**O que mostrar:**
+- Apresentação (slides 1–3) — sem terminal, sem Grafana.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Prompt curto — não precisa de dados do cluster.
@@ -197,8 +111,8 @@ Escreva em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-lab.json` |
-| Notas | Slides + kubectl. Prompt opcional. |
+| Dashboard | `grafana/dashboards/finops-ai-lab.json` |
+| Prompt | `ai-prompts/aula-01/1.2-desperdicios-operacionais.md` *(opcional)* |
 
 **Objetivo:** Explicar como workloads, escalabilidade, ambientes e pipelines influenciam padrões de utilização e custo.
 
@@ -206,13 +120,13 @@ Escreva em português do Brasil:
 - Slide 4: Observabilidade + FinOps
 - Slide 5: Workloads, requests, limits, HPA/VPA e namespaces
 
-**Demo / roteiro:**
-```bash
-kubectl get ns --show-labels
-kubectl get deploy -A
-```
+**O que mostrar:**
+- Slides 4–5.
+- Terminal: namespaces com labels (payments, users, staging).
+- Terminal: deployments do lab (payments-api, users-api, staging-api).
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 kubectl get ns --show-labels
 kubectl get deploy -A
@@ -251,18 +165,24 @@ Responda em português do Brasil, em linguagem para SRE/DevOps:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-lab.json` |
-| Notas | Slides + Grafana. Opcional: business-hours 2 min antes. |
+| Dashboard | `grafana/dashboards/finops-ai-lab.json` |
+| Prompt | `ai-prompts/aula-01/1.3-padroes-sazonalidade.md` |
 
 **Objetivo:** Mostrar como identificar tendências de consumo e crescimento operacional usando métricas de observabilidade.
 
 **Slides:**
-- Slides de tendências e crescimento operacional
+- Slide 6: Padrões de consumo e sazonalidade
+- Slide 7: Tendências de crescimento operacional
+- Slide 8: Leitura de tendências no Grafana (exemplo)
 
-**Demo / roteiro:**
-Abrir Grafana — dashboard `finops-ai-lab.json`. Comentar gauges e painéis de CPU/memória por namespace.
+**O que mostrar:**
+- Slides 6–8.
+- Grafana → `finops-ai-lab.json` → **Last 15 minutes**.
+- Comentar gauges de CPU/memória por namespace.
+- Opcional: iniciar business-hours-load 2 min antes para padrão de uso.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 ./scripts/start-business-hours-load.sh
 # aguarde 2–3 min
@@ -302,16 +222,29 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-lab.json` |
-| Notas | Slides + Grafana + menção Prometheus. |
+| Dashboard | `grafana/dashboards/finops-ai-lab.json` |
+| Prompt | `ai-prompts/aula-01/1.4-metricas-essenciais.md` |
 
 **Objetivo:** Explicar como alertas contextualizados conectam observabilidade técnica com visibilidade de custo.
 
 **Slides:**
-- Slides de alertas, SLIs e visibilidade de custo
+- Slide 9: Alertas contextualizados para FinOps
+- Slide 10: SLIs, SLOs e indicadores de custo
+- Slide 11: Visibilidade de custo orientada por contexto
 
-**Demo / roteiro:**
-Mencionar Prometheus (`localhost:9090`) e painéis do Grafana. Gráficos de slide como exemplo conceitual.
+**O que mostrar:**
+- Slides 9–11.
+- Grafana → painéis do `finops-ai-lab.json`.
+- Mencionar Prometheus (`localhost:9090`) — opcional.
+- Gráficos do slide = exemplo conceitual; compare com Grafana ao vivo.
+
+**Comandos:**
+
+```bash
+# Terminal B (opcional):
+kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090
+# http://localhost:9090
+```
 
 **Antes de colar o prompt:**
 Slides + menção Prometheus/Grafana. Gráficos de slide como exemplo conceitual.
@@ -339,40 +272,32 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **H** |
 | Tempo | 12–15 min |
-| Dashboard | `finops-ai-lab.json` |
-| Notas | Hands-on — fluxo completo abaixo. |
+| Dashboard | `grafana/dashboards/finops-ai-lab.json` |
+| Prompt | `ai-prompts/aula-01/1.5-panorama-consumo.md` |
 
 **Objetivo:** Demonstrar análise operacional completa usando Grafana, kubectl e IA.
 
 **Slides:**
-Nenhum (ou resumo de 1 slide).
+Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
-**Demo / roteiro:**
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl get ns --show-labels
-kubectl get deploy -A
-kubectl top pods -A
-```
+**O que mostrar:**
+- Sem slides (ou 1 slide de resumo).
+- Grafana → `finops-ai-lab.json` → **Last 15 minutes**.
+- Gauges por namespace + Top CPU/Memory Consumers.
+- Comparar dados reais com exemplos dos slides anteriores.
+- Colar saída de `collect-lab-context.sh` no prompt e comentar resposta da IA.
 
-1. Abrir dashboard `finops-ai-lab.json`
-2. Comentar gauges e Top CPU/Memory Consumers
-3. Comparar dados reais com exemplos dos slides
-4. Colar prompt de `ai-prompts/aula-01/1.5-panorama-consumo.md`
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 ./scripts/start-business-hours-load.sh
 sleep 120
 ./scripts/collect-lab-context.sh
+kubectl get ns --show-labels
+kubectl get deploy -A
+kubectl top pods -A
 ```
-
-**Passos na tela:**
-1. http://localhost:3000 → `finops-ai-lab.json` → **Last 15 minutes**
-2. Gauges por namespace + Top CPU/Memory Consumers
-3. Colar saída do `collect-lab-context.sh` no prompt abaixo
-4. Comparar resposta da IA com o Grafana
 
 **Antes de colar o prompt:**
 Hands-on. Rode `./scripts/collect-lab-context.sh` e cole a saída no lugar dos dados de exemplo.
@@ -406,7 +331,7 @@ Responda em português do Brasil:
 
 ## Aula 2 — Rightsizing e eficiência operacional automatizada
 
-**Dashboard:** `finops-ai-rightsizing.json` | **Prompts:** `ai-prompts/aula-02/`
+**Dashboard:** `grafana/dashboards/finops-ai-rightsizing.json` | **Port-forwards:** Grafana (vídeos 2.2, 2.5)
 
 ### Vídeo 2.1 — O impacto do over-provisioning em ambientes modernos
 
@@ -414,16 +339,22 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `finops-ai-rightsizing.json` |
-| Notas | Slides. Citar payments-api. |
+| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Prompt | `ai-prompts/aula-02/2.1-business-case-em.md` |
 
 **Objetivo:** Explicar consequências de over-provisioning em custo, capacidade e operação.
 
 **Slides:**
-- Slides de over-provisioning e desperdício
+- Slide 1: Introdução — rightsizing operacional
+- Slide 2: O impacto do over-provisioning
+- Slide 3: Desperdício em ambientes modernos
 
-**Demo / roteiro:**
-Nenhuma. Citar `payments-api` como exemplo do lab.
+**O que mostrar:**
+- Slides 1–3.
+- Citar `payments-api` como exemplo do lab (overprovisionado).
+- Sem terminal.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Citar `payments-api` como exemplo do lab.
@@ -454,18 +385,23 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-rightsizing.json` |
-| Notas | Slides + dashboard Usage vs Requests. |
+| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Prompt | `ai-prompts/aula-02/2.2-rightsizing-payments-api.md` |
 
 **Objetivo:** Mostrar como comparar requests vs uso real para identificar oportunidades de rightsizing.
 
 **Slides:**
-- Slides de rightsizing e margem de segurança
+- Slide 4: Rightsizing baseado em comportamento real
+- Slide 5: Margem de segurança operacional
+- Slide 6: Usage vs Requests (conceito)
 
-**Demo / roteiro:**
-Abrir dashboard `finops-ai-rightsizing.json` — painéis CPU/Memory Usage vs Requests.
+**O que mostrar:**
+- Slides 4–6.
+- Grafana → `finops-ai-rightsizing.json` → **Last 15 minutes**.
+- Painéis: CPU/Memory Usage vs Requests, CPU Waste %.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 # Grafana → finops-ai-rightsizing.json → Last 15 minutes
 # Painéis: Usage vs Requests, Waste %
@@ -510,18 +446,23 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-rightsizing.json` |
-| Notas | Slides + kubectl describe opcional. |
+| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Prompt | `ai-prompts/aula-02/2.3-automacao-vpa.md` |
 
 **Objetivo:** Apresentar VPA, recomendações automatizadas e rollout gradual.
 
 **Slides:**
-- Slides de VPA, HPA e automação
+- Slide 7: VPA e recomendações automatizadas
+- Slide 8: HPA, VPA e rollout gradual
+- Slide 9: Automação operacional de rightsizing
 
-**Demo / roteiro:**
-Conceitual. Mencionar `kubectl describe deployment payments-api -n payments`.
+**O que mostrar:**
+- Slides 7–9.
+- Conceitual — mencionar requests/limits do payments-api.
+- Opcional: `kubectl describe deployment payments-api -n payments`.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 kubectl describe deployment payments-api -n payments
 ```
@@ -552,16 +493,22 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-rightsizing.json` |
-| Notas | Slides. Citar staging-api. Prompt opcional. |
+| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Prompt | `ai-prompts/aula-02/2.4-comparativo-workloads.md` *(opcional)* |
 
 **Objetivo:** Discutir otimização de workloads subutilizados e ambientes não produtivos.
 
 **Slides:**
-- Slides de scheduling e ambientes staging
+- Slide 10: Scheduling inteligente
+- Slide 11: Otimização de workloads subutilizados
+- Slide 12: Ambientes staging e scale-down
 
-**Demo / roteiro:**
-Conceitual. Citar `staging-api` como workload subutilizado.
+**O que mostrar:**
+- Slides 10–12.
+- Citar `staging-api` como workload subutilizado.
+- Sem demo obrigatória.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Opcional. Conceitual — citar `staging-api` como workload subutilizado.
@@ -595,39 +542,29 @@ Responda em português do Brasil para um Platform Engineer:
 |-------|-------|
 | Tipo | **H** |
 | Tempo | 12–15 min |
-| Dashboard | `finops-ai-rightsizing.json` |
-| Notas | Hands-on — fluxo completo abaixo. |
+| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Prompt | `ai-prompts/aula-02/2.5-rightsizing-hands-on.md` |
 
 **Objetivo:** Executar pipeline completo: métricas → análise → recomendação IA → plano de ação.
 
 **Slides:**
-Nenhum.
+Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
-**Demo / roteiro:**
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl describe deployment payments-api -n payments
-kubectl top pods -n payments
-```
+**O que mostrar:**
+- Sem slides.
+- Grafana → `finops-ai-rightsizing.json` → CPU Waste, Top Overprovisioned, Candidates.
+- Destacar **payments** (over) e **staging** (sub).
+- Colar `collect-lab-context.sh` no prompt (Prompt A + B).
+- Enfatizar: não aplicaria em prod sem validar em staging.
 
-1. Abrir dashboard `finops-ai-rightsizing.json`
-2. Mostrar CPU Waste Percentage e Top Overprovisioned Pods
-3. Destacar candidates payments e staging
-4. Colar prompt de `ai-prompts/aula-02/2.5-rightsizing-hands-on.md` (contém Prompt A + B)
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 ./scripts/collect-lab-context.sh
 kubectl describe deployment payments-api -n payments
 kubectl top pods -n payments
 ```
-
-**Passos na tela:**
-1. `finops-ai-rightsizing.json` → CPU Waste, Top Overprovisioned, Candidates
-2. Destacar **payments** (over) e **staging** (sub)
-3. Colar `collect-lab-context.sh` no prompt abaixo
-4. Enfatizar: não aplicaria em prod sem validar em staging
 
 **Antes de colar o prompt:**
 Hands-on. Rode `./scripts/collect-lab-context.sh` e substitua os dados de exemplo nos dois prompts abaixo.
@@ -687,7 +624,7 @@ Responda em português do Brasil para um Platform Engineer:
 
 ## Aula 3 — Anomalias de custo e capacity planning operacional
 
-**Dashboard:** `finops-ai-anomalies.json` | **Prompts:** `ai-prompts/aula-03/`
+**Dashboard:** `grafana/dashboards/finops-ai-anomalies.json` | **Port-forwards:** Grafana (todos)
 
 ### Vídeo 3.1 — Detectando comportamento anormal de consumo
 
@@ -695,21 +632,26 @@ Responda em português do Brasil para um Platform Engineer:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 8–10 min |
-| Dashboard | `finops-ai-anomalies.json` |
-| Notas | Slides + dashboard sem spike. |
+| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Prompt | `ai-prompts/aula-03/3.1-deteccao-anomalia-cpu.md` |
 
 **Objetivo:** Explicar baseline, desvio e detecção de anomalias operacionais.
 
 **Slides:**
-- Slides de detecção de anomalias
+- Slide 1: Introdução — anomalias operacionais
+- Slide 2: Baseline e detecção de desvio
+- Slide 3: Comportamento anormal de consumo
 
-**Demo / roteiro:**
-Abrir dashboard — Payments CPU Timeline (baseline).
+**O que mostrar:**
+- Slides 1–3.
+- Grafana → `finops-ai-anomalies.json` → **Last 15 minutes**.
+- Painel Payments CPU Timeline — baseline, **sem** cpu-spike ativo.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 # Grafana → finops-ai-anomalies.json → Last 15 minutes
-# Painel: Payments CPU Timeline (sem cpu-spike ativo)
+# Painel: Payments CPU Timeline (sem cpu-spike)
 ```
 
 **Antes de colar o prompt:**
@@ -747,24 +689,26 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T++** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-anomalies.json` |
-| Notas | Slides + ativar spike. |
+| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Prompt | `ai-prompts/aula-03/3.2-investigacao-anomalia-cpu.md` |
 
 **Objetivo:** Demonstrar processo de investigação: detectar → correlacionar → isolar causa.
 
 **Slides:**
-- Slides de investigação e correlação
+- Slide 4: Investigando origem de anomalias
+- Slide 5: Correlação de eventos e métricas
+- Slide 6: Processo de triagem
 
-**Demo / roteiro:**
-```bash
-./scripts/start-anomaly.sh
-kubectl get pods -n payments
-kubectl top pods -n payments
-```
+**O que mostrar:**
+- Slides 4–6.
+- Ativar spike com `start-anomaly.sh`.
+- Terminal: pods e `kubectl top` em payments.
+- Grafana → CPU Spike Detector (~30s).
+- Explicar que `cpu-spike` simula anomalia.
+- Encerrar com `stop-anomaly.sh`.
 
-Mostrar spike no CPU Spike Detector. Explicar que `cpu-spike` simula anomalia.
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 ./scripts/start-anomaly.sh
 kubectl get pods -n payments
@@ -808,16 +752,26 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-anomalies.json` |
-| Notas | Slides + Capacity Headroom. |
+| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Prompt | `ai-prompts/aula-03/3.3-capacity-planning.md` |
 
 **Objetivo:** Apresentar capacity planning com headroom, allocatable e projeções.
 
 **Slides:**
-- Slides de capacity planning (gráficos como exemplo conceitual)
+- Slide 7: Capacity planning operacional
+- Slide 8: Headroom e projeções
+- Slide 9: Planejamento pós-incidente
 
-**Demo / roteiro:**
-Painel Capacity Headroom no dashboard anomalies.
+**O que mostrar:**
+- Slides 7–9.
+- Grafana → painel **Capacity Headroom** no dashboard anomalies.
+- Gráficos do slide = exemplo conceitual.
+
+**Comandos:**
+
+```bash
+# Grafana → finops-ai-anomalies.json → Capacity Headroom
+```
 
 **Antes de colar o prompt:**
 Painel Capacity Headroom no dashboard `finops-ai-anomalies.json`.
@@ -848,24 +802,25 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T++** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-anomalies.json` |
-| Notas | Slides + anomalia silenciosa staging. |
+| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Prompt | `ai-prompts/aula-03/3.4-anomalia-silenciosa-staging.md` |
 
 **Objetivo:** Discutir estratégias de otimização pós-anomalia e prevenção.
 
 **Slides:**
-- Slides de otimização e prevenção
+- Slide 10: Otimização de recursos pós-anomalia
+- Slide 11: Anomalias silenciosas de custo
+- Slide 12: Prevenção e políticas
 
-**Demo / roteiro:**
-```bash
-./scripts/start-staging-anomaly.sh
-kubectl get jobs -n staging -l app=backup-sync
-kubectl top pods -n staging
-```
+**O que mostrar:**
+- Slides 10–12.
+- Ativar `start-staging-anomaly.sh`.
+- Terminal: jobs `backup-sync` em staging.
+- Mostrar staging-api estável, mas jobs geram rajadas de CPU/custo.
+- Encerrar com `stop-staging-anomaly.sh`.
 
-Mostrar que staging-api está estável, mas jobs `backup-sync` geram rajadas de CPU/custo.
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 ./scripts/start-staging-anomaly.sh
 kubectl get jobs -n staging -l app=backup-sync
@@ -903,32 +858,23 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **H** |
 | Tempo | 12–15 min |
-| Dashboard | `finops-ai-anomalies.json` |
-| Notas | Hands-on — fluxo completo abaixo. |
+| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Prompt | `ai-prompts/aula-03/3.5-runbook-anomalias.md` |
 
 **Objetivo:** Fluxo completo: baseline → spike → investigação → capacity → encerramento.
 
 **Slides:**
-Nenhum.
+Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
-**Demo / roteiro:**
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-./scripts/start-business-hours-load.sh
-sleep 120
-./scripts/start-anomaly.sh
-./scripts/collect-anomaly-context.sh
-# ... análise no dashboard ...
-./scripts/stop-all-anomalies.sh
-```
+**O que mostrar:**
+- Sem slides.
+- Grafana → `finops-ai-anomalies.json` → **Last 15 minutes**.
+- Fluxo: baseline (business-hours) → spike → Top CPU Consumers → Capacity Headroom.
+- Colar `collect-anomaly-context.sh` no prompt.
+- `stop-all-anomalies.sh` → confirmar retorno ao baseline.
 
-1. Abrir dashboard `finops-ai-anomalies.json` (Last 15 minutes)
-2. Mostrar baseline com business-hours-load, ativar spike, investigar Top CPU Consumers
-3. Verificar Capacity Headroom
-4. Colar saída de `collect-anomaly-context.sh` em `ai-prompts/aula-03/3.5-runbook-anomalias.md`
-5. Parar anomalias e confirmar retorno ao baseline
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 ./scripts/stop-all-anomalies.sh
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
@@ -936,13 +882,8 @@ kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 sleep 120
 ./scripts/start-anomaly.sh
 ./scripts/collect-anomaly-context.sh
+./scripts/stop-all-anomalies.sh
 ```
-
-**Passos na tela:**
-1. `finops-ai-anomalies.json` → **Last 15 minutes**
-2. Baseline → spike → Top CPU Consumers → Capacity Headroom
-3. Colar `collect-anomaly-context.sh` no prompt abaixo
-4. `./scripts/stop-all-anomalies.sh` → confirmar retorno ao baseline
 
 **Antes de colar o prompt:**
 Hands-on. Cole a saída de `./scripts/collect-anomaly-context.sh` no final do prompt, se disponível.
@@ -967,7 +908,7 @@ Responda em português do Brasil, formato runbook para SRE on-call:
 
 ## Aula 4 — Governança operacional e visibilidade de custos
 
-**Dashboard:** `finops-ai-governance.json` | **Prompts:** `ai-prompts/aula-04/`
+**Dashboard:** `grafana/dashboards/finops-ai-governance.json` | **Port-forwards:** Grafana (4.2+) + OpenCost (4.3, 4.5)
 
 ### Vídeo 4.1 — Ownership e responsabilidade sobre consumo cloud
 
@@ -975,20 +916,22 @@ Responda em português do Brasil, formato runbook para SRE on-call:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 8–10 min |
-| Dashboard | `finops-ai-governance.json` |
-| Notas | Slides + labels. |
+| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Prompt | `ai-prompts/aula-04/4.1-auditoria-labels.md` |
 
 **Objetivo:** Explicar ownership, responsabilidade e accountability sobre consumo.
 
 **Slides:**
-- Slides de ownership e FinOps
+- Slide 1: Introdução — governança FinOps
+- Slide 2: Ownership e responsabilidade
+- Slide 3: Accountability sobre consumo cloud
 
-**Demo / roteiro:**
-```bash
-kubectl get ns --show-labels
-```
+**O que mostrar:**
+- Slides 1–3.
+- Terminal: `kubectl get ns --show-labels` — team, environment, cost-center.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 kubectl get ns --show-labels
 ```
@@ -1027,16 +970,25 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-governance.json` |
-| Notas | Slides + Governance Matrix. |
+| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Prompt | `ai-prompts/aula-04/4.2-politica-ambientes.md` |
 
 **Objetivo:** Apresentar classificação por team, environment, cost-center e service-tier.
 
 **Slides:**
-- Slides de classificação e tagging
+- Slide 4: Classificação de recursos
+- Slide 5: Tagging (team, environment, cost-center)
+- Slide 6: Política prod vs staging
 
-**Demo / roteiro:**
-Painel Governance Matrix no dashboard governance.
+**O que mostrar:**
+- Slides 4–6.
+- Grafana → `finops-ai-governance.json` → painel **Governance Matrix**.
+
+**Comandos:**
+
+```bash
+# Grafana → finops-ai-governance.json → Governance Matrix
+```
 
 **Antes de colar o prompt:**
 Painel Governance Matrix no dashboard `finops-ai-governance.json`.
@@ -1068,19 +1020,24 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-governance.json` |
-| Notas | Slides + Showback + OpenCost. |
+| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Prompt | `ai-prompts/aula-04/4.3-showback-chargeback.md` |
 
 **Objetivo:** Explicar showback, chargeback e alocação por contexto operacional.
 
 **Slides:**
-- Slides de showback/chargeback (exemplos conceituais)
+- Slide 7: Showback
+- Slide 8: Chargeback
+- Slide 9: Alocação orientada por contexto
 
-**Demo / roteiro:**
-Painel Showback View no dashboard. Abrir **OpenCost** (`localhost:9003`) — ferramenta principal.
-*(Opcional)* Screenshot AWS Cost Explorer como complemento visual.
+**O que mostrar:**
+- Slides 7–9.
+- Grafana → painel **Showback View**.
+- OpenCost → `http://localhost:9003` (Allocation, Namespace Costs).
+- Opcional: screenshot AWS Cost Explorer.
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
@@ -1121,16 +1078,25 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 10–12 min |
-| Dashboard | `finops-ai-governance.json` |
-| Notas | Slides + Guardrails Checklist. |
+| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Prompt | `ai-prompts/aula-04/4.4-guardrails.md` |
 
 **Objetivo:** Apresentar ResourceQuota, LimitRange, labels obrigatórios e políticas Kyverno/OPA.
 
 **Slides:**
-- Slides de guardrails e políticas
+- Slide 10: Guardrails e políticas
+- Slide 11: ResourceQuota, LimitRange, OPA/Kyverno
+- Slide 12: Eficiência sem atrito
 
-**Demo / roteiro:**
-Painel Guardrails Checklist no dashboard governance.
+**O que mostrar:**
+- Slides 10–12.
+- Grafana → painel **Guardrails Checklist** (conceitual — não deployado no lab).
+
+**Comandos:**
+
+```bash
+# Grafana → finops-ai-governance.json → Guardrails Checklist
+```
 
 **Antes de colar o prompt:**
 Painel Guardrails Checklist no dashboard governance.
@@ -1162,40 +1128,29 @@ Responda em português do Brasil para DevOps/Platform:
 |-------|-------|
 | Tipo | **H** |
 | Tempo | 12–15 min |
-| Dashboard | `finops-ai-governance.json` |
-| Notas | Hands-on — fluxo completo abaixo. |
+| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Prompt | `ai-prompts/aula-04/4.5-visibilidade-persona.md` |
 
 **Objetivo:** Demonstrar visibilidade completa: labels, showback proxy, OpenCost e governança.
 
 **Slides:**
-Nenhum.
+Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
-**Demo / roteiro:**
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl port-forward -n opencost svc/opencost 9003:9090
-kubectl get ns --show-labels
-```
+**O que mostrar:**
+- Sem slides.
+- Grafana → Matrix, Showback, Guardrails.
+- OpenCost → custo por namespace/workload.
+- Colar `collect-lab-context.sh` no prompt.
+- Opcional: comparar com screenshot AWS Cost Explorer.
 
-1. Abrir dashboard `finops-ai-governance.json`
-2. Percorrer Governance Matrix, Showback View, Guardrails
-3. Abrir OpenCost — custo por namespace/workload
-4. Colar prompt de `ai-prompts/aula-04/4.5-visibilidade-persona.md`
-5. *(Opcional)* Comparar com screenshot AWS Cost Explorer
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
 ./scripts/collect-lab-context.sh
 kubectl get ns --show-labels
 ```
-
-**Passos na tela:**
-1. `finops-ai-governance.json` → Matrix, Showback, Guardrails
-2. http://localhost:9003 → custo por namespace/workload
-3. Colar `collect-lab-context.sh` no prompt abaixo
-4. *(Opcional)* screenshot AWS Cost Explorer
 
 **Antes de colar o prompt:**
 Hands-on. Rode `./scripts/collect-lab-context.sh` e substitua dados de exemplo, se aplicável.
@@ -1224,7 +1179,7 @@ Responda em português do Brasil:
 
 ## Aula 5 — Operações cloud orientadas por eficiência
 
-**Dashboard:** `Todos os dashboards` | **Prompts:** `ai-prompts/aula-05/`
+**Dashboard:** `Todos os dashboards anteriores` | **Port-forwards:** Grafana (5.1, 5.5) + OpenCost (5.5)
 
 ### Vídeo 5.1 — Relacionando custo, performance e observabilidade
 
@@ -1232,18 +1187,22 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T+** |
 | Tempo | 8–10 min |
-| Dashboard | `Todos os dashboards` |
-| Notas | Slides + tour nos 4 dashboards. |
+| Dashboard | `Todos os dashboards anteriores` |
+| Prompt | `ai-prompts/aula-05/5.1-diagnostico-consolidado.md` |
 
 **Objetivo:** Conectar os três pilares e mostrar trade-offs em decisões operacionais.
 
 **Slides:**
-- Slides de custo × performance × observabilidade
+- Slide 1: Introdução — eficiência operacional contínua
+- Slide 2: Custo × performance × observabilidade
+- Slide 3: Trade-offs operacionais
 
-**Demo / roteiro:**
-Visão rápida dos dashboards das aulas 1–4 no Grafana.
+**O que mostrar:**
+- Slides 1–3.
+- Tour rápido nos 4 dashboards Grafana (~30s cada).
 
-**Comandos e passos (folha operacional):**
+**Comandos:**
+
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 # finops-ai-lab → rightsizing → anomalies → governance
@@ -1289,16 +1248,22 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards` |
-| Notas | Slides + matriz impacto×esforço. |
+| Dashboard | `Todos os dashboards anteriores` |
+| Prompt | `ai-prompts/aula-05/5.2-priorizacao-matriz.md` |
 
 **Objetivo:** Apresentar matriz impacto × esforço e priorização de ações.
 
 **Slides:**
-- Slides de priorização e decisão
+- Slide 4: Tomada de decisão orientada por dados
+- Slide 5: Matriz impacto × esforço
+- Slide 6: Priorização de ações
 
-**Demo / roteiro:**
-Conceitual. Resumir achados do lab em tabela.
+**O que mostrar:**
+- Slides 4–6.
+- Resumir achados do lab em tabela (conceitual).
+- Sem lab obrigatório.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Conceitual. Resumir achados do lab em tabela antes de colar.
@@ -1334,16 +1299,22 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards` |
-| Notas | Slides. Sem lab. |
+| Dashboard | `Todos os dashboards anteriores` |
+| Prompt | `ai-prompts/aula-05/5.3-plano-90-dias.md` |
 
 **Objetivo:** Apresentar ciclo contínuo de eficiência e plano de 90 dias.
 
 **Slides:**
-- Slides de eficiência contínua (forecast como exemplo conceitual)
+- Slide 7: Eficiência contínua
+- Slide 8: Plano de otimização (90 dias)
+- Slide 9: Forecast e projeção (exemplo conceitual)
 
-**Demo / roteiro:**
-Nenhuma. *(Opcional)* Screenshot AWS Cost Explorer forecast.
+**O que mostrar:**
+- Slides 7–9.
+- Sem lab.
+- Opcional: screenshot AWS Cost Explorer forecast.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Slides de eficiência contínua.
@@ -1380,13 +1351,21 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards` |
-| Notas | Slides de fechamento. |
+| Dashboard | `Todos os dashboards anteriores` |
+| Prompt | `ai-prompts/aula-05/5.4-recomendacoes-executivas.md` |
 
 **Objetivo:** Fechar o arco do curso com cultura, KPIs e governança de longo prazo.
 
 **Slides:**
-- Slides de cultura FinOps e KPIs
+- Slide 10: Cultura FinOps
+- Slide 11: KPIs executivos
+- Slide 12: Fechamento do curso
+
+**O que mostrar:**
+- Slides 10–12.
+- Sem lab.
+
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Slides de cultura FinOps e KPIs.
@@ -1421,41 +1400,30 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **H** |
 | Tempo | 12–15 min |
-| Dashboard | `Todos os dashboards` |
-| Notas | Hands-on final — prompt mestre. |
+| Dashboard | `Todos os dashboards anteriores` |
+| Prompt | `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` |
 
 **Objetivo:** Executar fluxo end-to-end: observar → rightsizing → anomalias → governança → plano consolidado com IA.
 
 **Slides:**
-Nenhum.
+Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
-**Demo / roteiro:**
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl port-forward -n opencost svc/opencost 9003:9090
-kubectl top pods -A
-```
+**O que mostrar:**
+- Sem slides.
+- Percorrer 4 dashboards (1 min cada) → **Last 15 minutes**.
+- Resumo: payments over, users ok, staging sub, anomalias = lição.
+- OpenCost → visão consolidada.
+- Colar `collect-lab-context.sh` no **prompt mestre**.
+- Apresentar plano de 90 dias e KPIs da resposta da IA.
 
-1. Percorrer os 4 dashboards (resumo de 1 min cada)
-2. Resumir achados: payments overprovisionado, users saudável, staging subutilizado, cpu-spike como lição
-3. Abrir OpenCost para visão consolidada
-4. Colar prompt de `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` (prompt mestre)
-5. Apresentar plano de 90 dias e KPIs da resposta
+**Comandos:**
 
-**Comandos e passos (folha operacional):**
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
 ./scripts/collect-lab-context.sh
 kubectl top pods -A
 ```
-
-**Passos na tela:**
-1. Percorrer 4 dashboards (1 min cada) → **Last 15 minutes**
-2. Resumo: payments over, users ok, staging sub, anomalias = lição
-3. http://localhost:9003 → visão consolidada
-4. Colar `collect-lab-context.sh` no prompt mestre abaixo
-5. Plano de 90 dias + KPIs da resposta da IA
 
 **Antes de colar o prompt:**
 Hands-on final. Cole `./scripts/collect-lab-context.sh` na seção `[DADOS]`. Mostre como salvar como template reutilizável.
@@ -1491,13 +1459,150 @@ Vou colar métricas atualizadas abaixo. Analise e devolva:
 
 ---
 
-## Apêndice — Legenda de tipos de vídeo
+## Parte 3 — Checklist de gravação
 
-| Tipo | Significado |
-|------|-------------|
-| **T** | Teoria pura — slides + prompt IA, sem lab |
-| **T+** | Teoria + demo leve — kubectl ou dashboard estático |
-| **T++** | Teoria + demo ativa — scripts, spikes, jobs |
-| **H** | Hands-on — demo completa (vídeo X.5) |
+Checklist operacional para garantir qualidade técnica e consistência em cada sessão de gravação.
 
-*Gerado automaticamente por `scripts/generate-manual-gravacao.py`*
+---
+
+## Checklist antes da gravação (geral)
+
+### Ambiente local
+
+- [ ] Minikube rodando (`minikube status`)
+- [ ] `kubectl cluster-info` responde sem erro
+- [ ] Helm instalado e funcional
+- [ ] Repositório clonado e atualizado na máquina de gravação
+
+### Stack do laboratório
+
+- [ ] Prometheus instalado (`kubectl get pods -n monitoring`)
+- [ ] Grafana acessível via port-forward (`localhost:3000`)
+- [ ] OpenCost instalado (`kubectl get pods -n opencost`)
+- [ ] Workloads do lab rodando (`kubectl get deploy -A | grep -E 'payments|users|staging'`)
+- [ ] `./scripts/warmup-lab-metrics.sh` executado (metricas nos dashboards)
+- [ ] Anomalias **desativadas** (`./scripts/stop-all-anomalies.sh` executado)
+
+### Dashboards
+
+- [ ] `finops-ai-lab.json` importado no Grafana
+- [ ] `finops-ai-rightsizing.json` importado no Grafana
+- [ ] `finops-ai-anomalies.json` importado no Grafana
+- [ ] `finops-ai-governance.json` importado no Grafana
+- [ ] Datasource Prometheus selecionado em todos os dashboards
+- [ ] Painéis exibindo dados (sem "No data")
+
+### Materiais de apoio
+
+- [ ] Slides da aula abertos e revisados
+- [ ] Manual completo aberto (`docs/manual-gravacao-completo.md` ou PDF `docs/manual-gravacao-completo.pdf`)
+
+### Setup de gravação
+
+- [ ] Terminal limpo (sem histórico confuso ou credenciais visíveis)
+- [ ] Navegador sem abas pessoais (apenas Grafana, Prometheus, OpenCost, IA)
+- [ ] Notificações do sistema desativadas (modo Não Perturbe)
+- [ ] Microfone testado e nível de áudio adequado
+- [ ] Zoom da tela entre 100% e 125% (texto legível)
+- [ ] Credenciais sensíveis escondidas (senha Grafana, tokens, `.env`)
+- [ ] Resolução de gravação configurada (mín. 1280×720)
+- [ ] Port-forwards necessários abertos em terminais separados
+
+---
+
+## Checklist por aula
+
+### Aula 1 — Observabilidade
+
+- [ ] Dashboard principal (`finops-ai-lab.json`) importado e com dados
+- [ ] Port-forward do Grafana ativo
+- [ ] `kubectl get ns --show-labels` testado
+- [ ] `kubectl get deploy -A` testado
+- [ ] `kubectl top pods -A` retorna métricas
+- [ ] Seção da Aula 1 no manual revisada (vídeos 1.1–1.5)
+
+### Aula 2 — Rightsizing
+
+- [ ] Dashboard rightsizing (`finops-ai-rightsizing.json`) importado e com dados
+- [ ] Painel CPU Waste Percentage mostra payments com waste alto
+- [ ] `kubectl describe deployment payments-api -n payments` testado
+- [ ] Seção da Aula 2 no manual revisada (vídeos 2.1–2.5)
+
+### Aula 3 — Anomalias
+
+- [ ] Dashboard anomalies (`finops-ai-anomalies.json`) importado e com dados
+- [ ] `./scripts/start-anomaly.sh` testado — spike visível no Grafana em ~30s
+- [ ] `./scripts/start-staging-anomaly.sh` testado — job `backup-sync` criado imediatamente
+- [ ] `./scripts/stop-all-anomalies.sh` testado — baseline restaurado
+- [ ] `./scripts/collect-anomaly-context.sh` testado — saída utilizável nos prompts
+- [ ] Seção da Aula 3 no manual revisada (vídeos 3.1–3.5)
+
+### Aula 4 — Governança
+
+- [ ] Dashboard governance (`finops-ai-governance.json`) importado e com dados
+- [ ] Port-forward do OpenCost ativo (`localhost:9003`)
+- [ ] `kubectl get ns --show-labels` mostra labels team, environment, cost-center
+- [ ] Seção da Aula 4 no manual revisada (vídeos 4.1–4.5)
+- [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
+
+### Aula 5 — Eficiência operacional
+
+- [ ] Todos os 4 dashboards acessíveis no Grafana
+- [ ] Port-forwards Grafana + OpenCost ativos
+- [ ] Seção da Aula 5 no manual revisada (vídeo 5.5 — prompt mestre)
+- [ ] Achados das aulas 1–4 anotados para o fluxo completo
+- [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
+
+---
+
+## Checklist durante a gravação
+
+- [ ] Nome do vídeo anunciado no início (ex.: "Vídeo 2.5 — Hands-on rightsizing")
+- [ ] Dados reais do lab mencionados (não apenas exemplos dos slides)
+- [ ] Gráficos de slide explicados como exemplos conceituais quando aplicável
+- [ ] Resposta da IA comentada criticamente (não aceitar cegamente)
+- [ ] Comandos executados em ritmo legível (pausar após output importante)
+- [ ] Erros técnicos anotados em tempo real para revisão posterior
+
+---
+
+## Checklist pós-gravação
+
+Preencha para **cada vídeo** gravado:
+
+| Campo | Vídeo ___ |
+|-------|-----------|
+| Arquivo salvo | [ ] Sim |
+| Nome padronizado | [ ] `aula-XX-video-XX-titulo-curto.mp4` |
+| Vídeo revisado (assistido pelo menos 1x) | [ ] Sim |
+| Erro técnico anotado | [ ] Sim / [ ] Não — descrição: ___________ |
+| Regravação necessária? | [ ] Sim / [ ] Não |
+
+### Critérios para marcar regravação
+
+Marque **Sim** se:
+
+- Comando falhou visivelmente e não foi corrigido na gravação
+- Dashboard mostrou "No data" durante a demo principal
+- Credencial sensível apareceu na tela
+- Áudio inaudível por mais de 10 segundos
+- Demo principal (hands-on) não foi concluída
+
+### Nome padronizado sugerido
+
+```text
+aula-01-video-01-desafio-eficiencia.mp4
+aula-01-video-05-hands-on-observabilidade.mp4
+aula-03-video-05-hands-on-anomalias.mp4
+aula-05-video-05-hands-on-fluxo-completo.mp4
+```
+
+---
+
+## Checklist de entrega final (após os 25 vídeos)
+
+- [ ] 25 vídeos gravados e nomeados
+- [ ] Todos os vídeos revisados
+- [ ] Regravações concluídas
+- [ ] Screenshots exportados (se aplicável)
+- [ ] Erros técnicos documentados para melhoria do lab
