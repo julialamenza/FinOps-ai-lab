@@ -15,6 +15,8 @@ Documento **único** para gravação do curso: setup, slides, o que mostrar, com
 
 > **Exportar PDF (opcional):** `./scripts/export-manual-gravacao-pdf.sh`
 
+> **Regenerar este arquivo** após editar `scripts/recording_data.py` ou prompts: `./scripts/generate-manual-gravacao.sh`
+
 > O lab é montado **na hora**. Use **Last 15 minutes** em todos os dashboards Grafana.
 
 ---
@@ -1606,3 +1608,5 @@ aula-05-video-05-hands-on-fluxo-completo.mp4
 - [ ] Regravações concluídas
 - [ ] Screenshots exportados (se aplicável)
 - [ ] Erros técnicos documentados para melhoria do lab
+
+*Gerado automaticamente por `scripts/generate-manual-gravacao.py`*
