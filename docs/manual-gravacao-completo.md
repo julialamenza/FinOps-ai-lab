@@ -121,9 +121,10 @@ Escreva em português do Brasil:
 **Slides:**
 - Slide 4: Observabilidade + FinOps
 - Slide 5: Workloads, requests, limits, HPA/VPA e namespaces
+- Slide 6: Desperdícios operacionais
 
 **O que mostrar:**
-- Slides 4–5.
+- Slides 4–6.
 - Terminal: namespaces com labels (payments, users, staging).
 - Terminal: deployments do lab (payments-api, users-api, staging-api).
 
@@ -173,12 +174,12 @@ Responda em português do Brasil, em linguagem para SRE/DevOps:
 **Objetivo:** Mostrar como identificar tendências de consumo e crescimento operacional usando métricas de observabilidade.
 
 **Slides:**
-- Slide 6: Padrões de consumo e sazonalidade
-- Slide 7: Tendências de crescimento operacional
-- Slide 8: Leitura de tendências no Grafana (exemplo)
+- Slide 7: Padrões de consumo e sazonalidade
+- Slide 8: Tendências de crescimento operacional
+- Slide 9: Leitura de tendências no Grafana (exemplo)
 
 **O que mostrar:**
-- Slides 6–8.
+- Slides 7–9.
 - Grafana → `finops-ai-lab.json` → **Last 15 minutes**.
 - Comentar gauges de CPU/memória por namespace.
 - Opcional: iniciar business-hours-load 2 min antes para padrão de uso.
@@ -230,12 +231,12 @@ Responda em português do Brasil:
 **Objetivo:** Explicar como alertas contextualizados conectam observabilidade técnica com visibilidade de custo.
 
 **Slides:**
-- Slide 9: Alertas contextualizados para FinOps
-- Slide 10: SLIs, SLOs e indicadores de custo
-- Slide 11: Visibilidade de custo orientada por contexto
+- Slide 10: Alertas contextualizados para FinOps
+- Slide 11: SLIs, SLOs e indicadores de custo
+- Slide 12: Visibilidade de custo orientada por contexto
 
 **O que mostrar:**
-- Slides 9–11.
+- Slides 10–12.
 - Grafana → painéis do `finops-ai-lab.json`.
 - Mencionar Prometheus (`localhost:9090`) — opcional.
 - Gráficos do slide = exemplo conceitual; compare com Grafana ao vivo.
