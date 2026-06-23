@@ -40,18 +40,23 @@ Responda em português do Brasil, em linguagem para SRE/DevOps:
 4. Proponha um checklist semanal de revisão operacional."""),
 
     ("01", "1.3", "padroes-sazonalidade", "Padrões de uso e sazonalidade", False,
-     "Slides + Grafana (`finops-ai-lab.json`, Last 15 minutes). Opcional: `./scripts/start-business-hours-load.sh` 2 min antes.",
-     """Atue como Platform Engineer. Com base nas séries abaixo, explique os padrões de uso e o que isso implica para planejamento de capacidade e custo.
+     "Slides + Grafana (`finops-ai-lab.json`, Last 15 minutes). Rode `./scripts/start-business-hours-load.sh` 2 min antes e comente no vídeo o que os gráficos mostram. Os números abaixo são **ilustrativos**, alinhados ao comportamento dos geradores de carga do lab — em produção você usaria 7–30 dias de histórico.",
+     """Atue como Platform Engineer. Com base nos padrões abaixo, explique o comportamento de uso e o que isso implica para planejamento de capacidade e custo.
 
-Consumo CPU médio por namespace (mCPU, janela 7 dias):
-- payments: seg-sex 65–80, sáb-dom 40–50 (carga estável, leve queda no fim de semana)
-- users: seg-sex 45–55, sáb-dom 35–42 (padrão saudável, uso próximo ao request)
-- staging: seg-sex 25–30, sáb-dom 5–10 (quase idle fora do horário comercial)
+Contexto do ambiente:
+- Cluster Kubernetes local (Minikube) com Prometheus/Grafana.
+- Gerador de carga em modo demo: comprime um dia inteiro em ~12 minutos (comercial → fora do pico → noite/fim de semana).
+- Em produção, a mesma análise usaria 7–30 dias para capturar sazonalidade real (seg–sex vs fim de semana).
 
-Memória:
-- payments: uso estável ~85 Mi por pod, request 1 Gi
-- users: uso estável ~75 Mi por pod, request 128 Mi
-- staging: uso ~55 Mi, request 512 Mi
+Consumo CPU por namespace (mCPU, soma dos pods — leitura do Grafana, Last 15 minutes):
+- payments: oscila entre ~30 na fase baixa e ~120+ na fase comercial (padrão variável, candidato a HPA)
+- users: ~45–55 estável o tempo todo (carga constante, sem sazonalidade)
+- staging: ~15–25 quase flat (quase idle o tempo todo)
+
+Memória (uso por pod vs request configurado):
+- payments: uso estável ~85 Mi por pod, request 1 Gi (grande folga)
+- users: uso estável ~75 Mi por pod, request 128 Mi (uso próximo ao request de memória)
+- staging: uso ~55 Mi por pod, request 512 Mi (subutilização persistente)
 
 Responda em português do Brasil:
 1. Classifique cada namespace: saudável, overprovisionado ou subdimensionado.
