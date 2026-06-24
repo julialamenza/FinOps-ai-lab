@@ -7,5 +7,5 @@
 | 2.1 | [`2.1-business-case-em.md`](aula-02/2.1-business-case-em.md) |
 | 2.2 | [`2.2-rightsizing-payments-api.md`](aula-02/2.2-rightsizing-payments-api.md) |
 | 2.3 | [`2.3-automacao-vpa.md`](aula-02/2.3-automacao-vpa.md) |
-| 2.4 | [`2.4-comparativo-workloads.md`](aula-02/2.4-comparativo-workloads.md) *(opcional)* |
+| 2.4 | [`2.4-rollout-hpa-vpa.md`](aula-02/2.4-rollout-hpa-vpa.md) *(opcional)* |
 | 2.5 | [`2.5-rightsizing-hands-on.md`](aula-02/2.5-rightsizing-hands-on.md) |

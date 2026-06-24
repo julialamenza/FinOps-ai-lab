@@ -412,34 +412,25 @@ Responda em português do Brasil:
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Sem demo. Citar `payments-api` com os dados de exemplo do prompt (requests vs uso real). Demo no Grafana fica para o vídeo 2.5.
+Sem demo. Slides 4–6. Citar `payments-api` com os dados do prompt (gap request vs uso). Demo no Grafana fica para o vídeo 2.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Você é um SRE com foco em rightsizing de workloads Kubernetes em produção.
+Estou gravando o vídeo 2.2 (slides 4–6: rightsizing por comportamento real, margem de segurança, Usage vs Requests).
 
-Analise o deployment payments-api (namespace payments) e sugira novos requests/limits.
+Contexto do lab: deployment payments-api (namespace payments), serviço crítico, overprovisionado.
 
-Dados atuais (2 réplicas):
-- Requests: CPU 1000m, Memória 1 Gi
-- Limits: CPU 1500m, Memória 2 Gi
+Dados de referência (7 dias, por pod, 2 réplicas):
+- Requests: CPU 1000m, Memória 1 Gi | Limits: CPU 1500m, Memória 2 Gi
+- Uso: CPU média 72m, P95 95m, pico 120m | Memória média 88 Mi, P95 110 Mi, pico 125 Mi
 
-Uso observado (7 dias, por pod):
-- CPU média: 72m | CPU P95: 95m | CPU pico isolado: 120m
-- Memória média: 88 Mi | Memória P95: 110 Mi | Pico: 125 Mi
-
-Restrições:
-- Manter margem de ~30% acima do P95 para requests
-- Limits devem absorver picos sem OOMKill ou throttling agressivo
-- Serviço é crítico (pagamentos), rollout gradual obrigatório
-
-Responda em português do Brasil:
-1. Valores sugeridos de requests e limits (CPU e memória) com justificativa.
-2. Risco operacional de cada mudança (baixo/médio/alto) e mitigação.
-3. Impacto estimado de capacidade liberada no cluster (CPU e memória agregadas).
-4. Plano de rollout: ordem, monitoração durante 48h, critério de rollback.
-5. Estimativa de economia relativa se o custo for proporcional aos requests (compare antes/depois em %).
+Responda em português do Brasil para complementar os slides (ainda sem executar mudanças):
+1. Explique o gap entre requests e uso real — CPU e memória — para um Platform Engineer.
+2. Por que usar P95 (e não só a média) como base para rightsizing?
+3. O que é margem de segurança operacional (~30% acima do P95) e por que não eliminar o gap de uma vez?
+4. Diferença prática entre Usage vs Requests no Kubernetes (scheduling, custo alocável, throttling).
+5. Este workload é candidato a rightsizing? Justifique em 3 bullet points.
 ```
 
 \newpage
@@ -453,37 +444,36 @@ Responda em português do Brasil:
 | Dashboard | — |
 | Prompt | `ai-prompts/aula-02/2.3-automacao-vpa.md` |
 
-**Objetivo:** Apresentar VPA, recomendações automatizadas e rollout gradual.
+**Objetivo:** Apresentar VPA e recomendações automatizadas.
 
 **Slides:**
 - Slide 7: VPA e recomendações automatizadas
-- Slide 8: HPA, VPA e rollout gradual
-- Slide 9: Automação operacional de rightsizing
 
 **O que mostrar:**
-- Slides 7–9.
-- Conceitual — fluxo métrica → IA → aprovação → GitOps no `payments-api`.
+- Slide 7.
+- Conceitual — quando usar VPA vs recomendações assistidas por IA.
 - Demo com dashboard e `collect-lab-context.sh` fica para o vídeo 2.5.
 - Sem terminal.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Sem demo. Conceitual — fluxo métrica → IA → GitOps no `payments-api`. Demo com terminal e dashboard fica para o vídeo 2.5.
+Sem demo. Slide 7 — VPA e recomendações automatizadas. Demo com terminal e dashboard fica para o vídeo 2.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Sou DevOps avaliando automação de rightsizing no cluster FinOps AI Lab (payments, users, staging).
+Estou gravando o vídeo 2.3 (slide 7 — VPA e recomendações automatizadas) no FinOps AI Lab.
 
-Hoje os requests são definidos manualmente no YAML. Uso Prometheus para métricas reais.
+Workloads: payments-api (crítico, overprovisionado), users-api (saudável), staging-api (subutilizado).
+Requests definidos manualmente no YAML; métricas reais via Prometheus.
 
 Responda em português do Brasil:
-1. Quando faz sentido usar VPA (Vertical Pod Autoscaler) vs. recomendações manuais assistidas por IA?
-2. Para payments-api, users-api e staging-api, qual abordagem você recomenda e por quê?
-3. Desenhe um fluxo simples: métrica → IA analisa → humano aprova → PR no GitOps.
-4. Que guardrails impedem que automação reduza requests de serviço crítico sem aprovação?
-5. Liste 3 anti-patterns comuns de rightsizing em Kubernetes que a IA não deve perpetuar.
+1. O que o VPA (Vertical Pod Autoscaler) faz e quais modos existem (Off, Initial, Recreation, Auto)?
+2. Quando VPA é adequado vs. recomendações manuais assistidas por IA?
+3. Para payments-api (crítico): recomendaria VPA em produção? Por quê?
+4. Para users-api e staging-api: mesma abordagem ou diferente?
+5. Três riscos de ativar VPA sem guardrails em serviço de pagamentos.
 ```
 
 \newpage
@@ -495,49 +485,41 @@ Responda em português do Brasil:
 | Tipo | **T** |
 | Tempo | 10–12 min |
 | Dashboard | — |
-| Prompt | `ai-prompts/aula-02/2.4-comparativo-workloads.md` *(opcional)* |
+| Prompt | `ai-prompts/aula-02/2.4-rollout-hpa-vpa.md` *(opcional)* |
 
-**Objetivo:** Discutir otimização de workloads subutilizados e ambientes não produtivos.
+**Objetivo:** Apresentar HPA, VPA e rollout gradual.
 
 **Slides:**
-- Slide 10: Scheduling inteligente
-- Slide 11: Otimização de workloads subutilizados
-- Slide 12: Ambientes staging e scale-down
+- Slide 8: HPA, VPA e rollout gradual
 
 **O que mostrar:**
-- Slides 10–12.
-- Citar `staging-api` como workload subutilizado.
+- Slide 8.
+- Conceitual — rollout gradual em serviço crítico (`payments-api`).
 - Sem terminal.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Opcional. Conceitual — citar `staging-api` como workload subutilizado.
+Opcional. Slide 8 — rollout gradual no `payments-api`. Sem demo.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Compare rightsizing entre três deployments e priorize por impacto financeiro.
+Estou gravando o vídeo 2.4 (slide 8 — HPA, VPA e rollout gradual).
 
-| Workload      | NS       | Réplicas | CPU req | CPU P95 | Mem req | Mem P95 | Criticidade |
-|---------------|----------|----------|---------|---------|---------|---------|-------------|
-| payments-api  | payments | 2        | 1000m   | 95m     | 1 Gi    | 110 Mi  | Alta        |
-| users-api     | users    | 2        | 100m    | 62m     | 128 Mi  | 92 Mi   | Alta        |
-| staging-api   | staging  | 1        | 500m    | 35m     | 512 Mi  | 72 Mi   | Baixa       |
+Contexto: ajuste proposto no payments-api (crítico, 2 réplicas) — reduzir CPU request de 1000m para ~125m e memória de 1 Gi para ~150 Mi, com margem sobre P95 observado.
 
-Premissa de custo (didática): custo alocável ≈ soma dos requests × preço unitário do cluster.
-
-Responda em português do Brasil para um Platform Engineer:
-1. Ranking de oportunidade de economia (1º ao 3º) com % estimado de redução de requests.
-2. Para cada workload: requests/limits recomendados.
-3. Qual mudança você faria na primeira sprint e qual deixaria para depois — e por quê.
-4. O users-api precisa de alteração ou serve como baseline saudável?
-5. staging-api: rightsizing ou scale-to-zero / desligamento noturno?
+Responda em português do Brasil:
+1. Diferença entre HPA (escala horizontal) e VPA (escala vertical) — quando cada um entra no rightsizing?
+2. Por que rightsizing em serviço crítico exige rollout gradual (não big bang)?
+3. Plano de rollout em 4 passos para payments-api (ordem, réplicas, monitoração, rollback).
+4. Métricas e alertas para monitorar nas primeiras 48h após o ajuste.
+5. Em que cenário o HPA entraria depois do rightsizing — ou competiria com o VPA?
 ```
 
 \newpage
 
-### Vídeo 2.5 — Hands-on — pipeline de rightsizing operacional
+### Vídeo 2.5 — Rightsizing — hands-on (payments + comparativo)
 
 | Campo | Valor |
 |-------|-------|
@@ -549,11 +531,14 @@ Responda em português do Brasil para um Platform Engineer:
 **Objetivo:** Executar pipeline completo: métricas → análise → recomendação IA → plano de ação.
 
 **Slides:**
-Nenhum *(hands-on — apenas lab + dashboard + IA)*
+- Slide 9: Automação operacional de rightsizing
+- Slide 10: Scheduling inteligente
 
 **O que mostrar:**
+- Slides 9–10.
 - Grafana → `finops-ai-rightsizing.json` → **Last 15 minutes**.
-- Colar saída de `./scripts/collect-lab-context.sh` no prompt (A + B).
+- Citar `staging-api` como workload subutilizado (slide 10).
+- Colar saída de `./scripts/collect-lab-context.sh` nos prompts A, B e C.
 
 **Comandos:**
 
@@ -563,57 +548,65 @@ kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 ```
 
 **Antes de colar o prompt:**
-Hands-on. Rode `./scripts/collect-lab-context.sh` e substitua os dados de exemplo nos dois prompts abaixo.
+Hands-on. Slides 9–10. Rode `./scripts/collect-lab-context.sh` e cole a saída no bloco abaixo. Percorra o Grafana (`finops-ai-rightsizing.json`, Last 15 minutes) antes dos prompts A, B e C.
 
 **Prompt IA — copiar e colar:**
 
 ```
-## Prompt A — Rightsizing do payments-api
+## Contexto ao vivo
 
-Você é um SRE com foco em rightsizing de workloads Kubernetes em produção.
+[COLE AQUI A SAÍDA DE ./scripts/collect-lab-context.sh]
 
-Analise o deployment payments-api (namespace payments) e sugira novos requests/limits.
-
-Dados atuais (2 réplicas):
-- Requests: CPU 1000m, Memória 1 Gi
-- Limits: CPU 1500m, Memória 2 Gi
-
-Uso observado (7 dias, por pod):
-- CPU média: 72m | CPU P95: 95m | CPU pico isolado: 120m
-- Memória média: 88 Mi | Memória P95: 110 Mi | Pico: 125 Mi
-
-Restrições:
-- Manter margem de ~30% acima do P95 para requests
-- Limits devem absorver picos sem OOMKill ou throttling agressivo
-- Serviço é crítico (pagamentos), rollout gradual obrigatório
-
-Responda em português do Brasil:
-1. Valores sugeridos de requests e limits (CPU e memória) com justificativa.
-2. Risco operacional de cada mudança (baixo/médio/alto) e mitigação.
-3. Impacto estimado de capacidade liberada no cluster (CPU e memória agregadas).
-4. Plano de rollout: ordem, monitoração durante 48h, critério de rollback.
-5. Estimativa de economia relativa se o custo for proporcional aos requests (compare antes/depois em %).
+Observações do Grafana (finops-ai-rightsizing.json, Last 15 minutes):
+- payments: CPU Waste % alto
+- users: waste moderado/baixo
+- staging: subutilizado, waste alto
+- Painéis: CPU/Memory Usage vs Requests, Top Overprovisioned, Rightsizing Candidates
 
 ---
 
-## Prompt B — Comparativo entre os três workloads
+## Prompt A — Rightsizing do payments-api (dados ao vivo)
 
-Compare rightsizing entre três deployments e priorize por impacto financeiro.
+Você é um SRE. Com base no contexto coletado acima e no dashboard Grafana, analise payments-api e sugira novos requests/limits.
 
-| Workload      | NS       | Réplicas | CPU req | CPU P95 | Mem req | Mem P95 | Criticidade |
-|---------------|----------|----------|---------|---------|---------|---------|-------------|
-| payments-api  | payments | 2        | 1000m   | 95m     | 1 Gi    | 110 Mi  | Alta        |
-| users-api     | users    | 2        | 100m    | 62m     | 128 Mi  | 92 Mi   | Alta        |
-| staging-api   | staging  | 1        | 500m    | 35m     | 512 Mi  | 72 Mi   | Baixa       |
+Restrições:
+- Margem ~30% acima do P95 para requests
+- Limits absorvem picos sem OOMKill ou throttling agressivo
+- Serviço crítico — rollout gradual
 
-Premissa de custo (didática): custo alocável ≈ soma dos requests × preço unitário do cluster.
+Responda em português do Brasil:
+1. Requests e limits sugeridos (CPU e memória) com justificativa baseada nos dados ao vivo.
+2. Risco (baixo/médio/alto) e mitigação.
+3. Capacidade liberada no cluster (CPU e memória agregadas, 2 réplicas).
+4. Plano de rollout (48h, critério de rollback).
+5. Economia relativa estimada (% vs requests atuais).
 
-Responda em português do Brasil para um Platform Engineer:
-1. Ranking de oportunidade de economia (1º ao 3º) com % estimado de redução de requests.
-2. Para cada workload: requests/limits recomendados.
-3. Qual mudança você faria na primeira sprint e qual deixaria para depois — e por quê.
-4. O users-api precisa de alteração ou serve como baseline saudável?
-5. staging-api: rightsizing ou scale-to-zero / desligamento noturno?
+---
+
+## Prompt B — Comparativo e scheduling inteligente (slide 10)
+
+Compare rightsizing entre payments-api, users-api e staging-api usando os dados do contexto acima.
+
+Premissa: custo alocável ≈ soma dos requests × preço unitário do cluster.
+
+Responda em português do Brasil:
+1. Ranking de oportunidade de economia (1º ao 3º) com % estimado.
+2. Requests/limits recomendados por workload.
+3. Primeira sprint vs. depois — o que muda e por quê.
+4. users-api: alterar ou manter como baseline?
+5. staging-api: rightsizing, scale-to-zero ou desligamento noturno (scheduling inteligente)?
+
+---
+
+## Prompt C — Pipeline de automação operacional (slide 9)
+
+Com base nas recomendações dos prompts A e B, desenhe um fluxo de rightsizing com IA no FinOps AI Lab.
+
+Responda em português do Brasil:
+1. Fluxo: métrica → IA analisa → humano aprova → PR no GitOps (passo a passo).
+2. Guardrails para payments-api (aprovação obrigatória, teto de redução, etc.).
+3. O que automatizar vs. o que manter manual neste lab.
+4. Checklist de validação antes de merge do PR de rightsizing.
 ```
 
 \newpage

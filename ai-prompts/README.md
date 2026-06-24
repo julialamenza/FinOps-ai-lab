@@ -38,7 +38,7 @@ Cada pasta `aula-XX/` tem um `README.md` com a tabela vídeo → arquivo.
 | 2.1 | `aula-02/2.1-business-case-em.md` | Business case para EM |
 | 2.2 | `aula-02/2.2-rightsizing-payments-api.md` | Rightsizing payments-api |
 | 2.3 | `aula-02/2.3-automacao-vpa.md` | Automação e VPA |
-| 2.4 | `aula-02/2.4-comparativo-workloads.md` | Comparativo workloads *(opcional)* |
+| 2.4 | `aula-02/2.4-rollout-hpa-vpa.md` | HPA, VPA e rollout gradual *(opcional)* |
 | 2.5 | `aula-02/2.5-rightsizing-hands-on.md` | Rightsizing *(hands-on)* |
 | 3.1 | `aula-03/3.1-deteccao-anomalia-cpu.md` | Detecção de anomalia |
 | 3.2 | `aula-03/3.2-investigacao-anomalia-cpu.md` | Investigação com spike ao vivo |
