@@ -463,7 +463,7 @@ Responda em português do Brasil:
 **O que mostrar:**
 - Slides 7–9.
 - Conceitual — fluxo métrica → IA → aprovação → GitOps no `payments-api`.
-- Demo com `kubectl describe` e dashboard fica para o vídeo 2.5.
+- Demo com dashboard e `collect-lab-context.sh` fica para o vídeo 2.5.
 - Sem terminal.
 
 **Comandos:** Nenhum.
@@ -552,23 +552,14 @@ Responda em português do Brasil para um Platform Engineer:
 Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
 **O que mostrar:**
-- Sem slides.
 - Grafana → `finops-ai-rightsizing.json` → **Last 15 minutes**.
-- Painéis: CPU/Memory Usage vs Requests, CPU Waste %, Top Overprovisioned, Candidates.
-- Destacar **payments** (over) e **staging** (sub).
-- Terminal: `kubectl describe` e `kubectl top` no payments.
-- Colar `collect-lab-context.sh` no prompt (Prompt A + B).
-- Enfatizar: não aplicaria em prod sem validar em staging.
+- Colar saída de `./scripts/collect-lab-context.sh` no prompt (A + B).
 
 **Comandos:**
 
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-# Grafana → finops-ai-rightsizing.json → Last 15 minutes
-# Painéis: Usage vs Requests, Waste %, Top Overprovisioned, Candidates
 ./scripts/collect-lab-context.sh
-kubectl describe deployment payments-api -n payments
-kubectl top pods -n payments
 ```
 
 **Antes de colar o prompt:**
@@ -1531,7 +1522,7 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] Dashboard rightsizing (`finops-ai-rightsizing.json`) importado e com dados *(vídeo 2.5)*
 - [ ] Port-forward do Grafana ativo *(vídeo 2.5)*
 - [ ] Painel CPU Waste Percentage mostra payments com waste alto *(vídeo 2.5)*
-- [ ] `kubectl describe deployment payments-api -n payments` testado *(vídeo 2.5)*
+- [ ] `./scripts/collect-lab-context.sh` testado *(vídeo 2.5)*
 - [ ] Seção da Aula 2 no manual revisada (vídeos 2.1–2.5)
 
 ### Aula 3 — Anomalias
