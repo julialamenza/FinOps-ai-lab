@@ -19,6 +19,10 @@ def render_video(v: tuple) -> str:
     vid, title, tipo, tempo, objetivo, slides, mostrar, cmds, prompt_rel, opcional = v
     aula = vid.split(".")[0]
     _, dashboard = AULA_META[aula]
+    if aula == "2" and tipo == "T":
+        dashboard_cell = "—"
+    else:
+        dashboard_cell = f"`{dashboard}`"
     prompt_path = f"ai-prompts/{prompt_rel}"
     opt = " *(opcional)*" if opcional else ""
     antes, prompt = load_prompt(prompt_rel)
@@ -30,7 +34,7 @@ def render_video(v: tuple) -> str:
         "|-------|-------|",
         f"| Tipo | **{tipo}** |",
         f"| Tempo | {tempo} |",
-        f"| Dashboard | `{dashboard}` |",
+        f"| Dashboard | {dashboard_cell} |",
         f"| Prompt | `{prompt_path}`{opt} |",
         "",
         f"**Objetivo:** {objetivo}",
@@ -136,10 +140,11 @@ def main() -> None:
         if aula != current_aula:
             current_aula = aula
             titulo, dash = AULA_META[aula]
+            dash_note = f" *(vídeo {aula}.5)*" if aula == "2" else ""
             parts.extend([
                 f"## Aula {aula} — {titulo}",
                 "",
-                f"**Dashboard:** `{dash}` | **Port-forwards:** {PORT_FORWARDS[aula]}",
+                f"**Dashboard:** `{dash}`{dash_note} | **Port-forwards:** {PORT_FORWARDS[aula]}",
                 "",
             ])
         parts.append(render_video(v))

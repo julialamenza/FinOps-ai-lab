@@ -46,7 +46,7 @@ minikube start --cpus=4 --memory=8192
 | Aula | Dashboard | Port-forwards |
 |------|-----------|---------------|
 | 1 | `grafana/dashboards/finops-ai-lab.json` | Grafana (vídeos 1.3+) |
-| 2 | `grafana/dashboards/finops-ai-rightsizing.json` | Grafana (vídeos 2.2, 2.5) |
+| 2 | `grafana/dashboards/finops-ai-rightsizing.json` | Grafana (vídeo 2.5) |
 | 3 | `grafana/dashboards/finops-ai-anomalies.json` | Grafana (todos) |
 | 4 | `grafana/dashboards/finops-ai-governance.json` | Grafana (4.2+) + OpenCost (4.3, 4.5) |
 | 5 | `Todos os dashboards anteriores` | Grafana (5.1, 5.5) + OpenCost (5.5) |
@@ -339,7 +339,7 @@ Responda em português do Brasil:
 
 ## Aula 2 — Rightsizing e eficiência operacional automatizada
 
-**Dashboard:** `grafana/dashboards/finops-ai-rightsizing.json` | **Port-forwards:** Grafana (vídeos 2.2, 2.5)
+**Dashboard:** `grafana/dashboards/finops-ai-rightsizing.json` *(vídeo 2.5)* | **Port-forwards:** Grafana (vídeo 2.5)
 
 ### Vídeo 2.1 — O impacto do over-provisioning em ambientes modernos
 
@@ -347,7 +347,7 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-02/2.1-business-case-em.md` |
 
 **Objetivo:** Explicar consequências de over-provisioning em custo, capacidade e operação.
@@ -391,12 +391,12 @@ Responda em português do Brasil:
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-02/2.2-rightsizing-payments-api.md` |
 
-**Objetivo:** Mostrar como comparar requests vs uso real para identificar oportunidades de rightsizing.
+**Objetivo:** Explicar como comparar requests vs uso real para identificar oportunidades de rightsizing.
 
 **Slides:**
 - Slide 4: Rightsizing baseado em comportamento real
@@ -405,18 +405,14 @@ Responda em português do Brasil:
 
 **O que mostrar:**
 - Slides 4–6.
-- Grafana → `finops-ai-rightsizing.json` → **Last 15 minutes**.
-- Painéis: CPU/Memory Usage vs Requests, CPU Waste %.
+- Explicar gap request vs uso com `payments-api` (dados do prompt).
+- Gráficos do slide = exemplo conceitual; demo no Grafana fica para o vídeo 2.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-# Grafana → finops-ai-rightsizing.json → Last 15 minutes
-# Painéis: Usage vs Requests, Waste %
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Dashboard `finops-ai-rightsizing.json`. Opcional: `./scripts/collect-lab-context.sh` para dados ao vivo.
+Sem demo. Citar `payments-api` com os dados de exemplo do prompt (requests vs uso real). Demo no Grafana fica para o vídeo 2.5.
 
 **Prompt IA — copiar e colar:**
 
@@ -452,9 +448,9 @@ Responda em português do Brasil:
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-02/2.3-automacao-vpa.md` |
 
 **Objetivo:** Apresentar VPA, recomendações automatizadas e rollout gradual.
@@ -466,17 +462,14 @@ Responda em português do Brasil:
 
 **O que mostrar:**
 - Slides 7–9.
-- Conceitual — mencionar requests/limits do payments-api.
-- Opcional: `kubectl describe deployment payments-api -n payments`.
+- Conceitual — fluxo métrica → IA → aprovação → GitOps no `payments-api`.
+- Demo com `kubectl describe` e dashboard fica para o vídeo 2.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-kubectl describe deployment payments-api -n payments
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Conceitual. Mencionar `kubectl describe deployment payments-api -n payments`.
+Sem demo. Conceitual — fluxo métrica → IA → GitOps no `payments-api`. Demo com terminal e dashboard fica para o vídeo 2.5.
 
 **Prompt IA — copiar e colar:**
 
@@ -501,7 +494,7 @@ Responda em português do Brasil:
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-rightsizing.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-02/2.4-comparativo-workloads.md` *(opcional)* |
 
 **Objetivo:** Discutir otimização de workloads subutilizados e ambientes não produtivos.
@@ -514,7 +507,7 @@ Responda em português do Brasil:
 **O que mostrar:**
 - Slides 10–12.
 - Citar `staging-api` como workload subutilizado.
-- Sem demo obrigatória.
+- Sem terminal.
 
 **Comandos:** Nenhum.
 
@@ -560,8 +553,10 @@ Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
 **O que mostrar:**
 - Sem slides.
-- Grafana → `finops-ai-rightsizing.json` → CPU Waste, Top Overprovisioned, Candidates.
+- Grafana → `finops-ai-rightsizing.json` → **Last 15 minutes**.
+- Painéis: CPU/Memory Usage vs Requests, CPU Waste %, Top Overprovisioned, Candidates.
 - Destacar **payments** (over) e **staging** (sub).
+- Terminal: `kubectl describe` e `kubectl top` no payments.
 - Colar `collect-lab-context.sh` no prompt (Prompt A + B).
 - Enfatizar: não aplicaria em prod sem validar em staging.
 
@@ -569,6 +564,8 @@ Nenhum *(hands-on — apenas lab + dashboard + IA)*
 
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
+# Grafana → finops-ai-rightsizing.json → Last 15 minutes
+# Painéis: Usage vs Requests, Waste %, Top Overprovisioned, Candidates
 ./scripts/collect-lab-context.sh
 kubectl describe deployment payments-api -n payments
 kubectl top pods -n payments
@@ -1531,9 +1528,10 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 
 ### Aula 2 — Rightsizing
 
-- [ ] Dashboard rightsizing (`finops-ai-rightsizing.json`) importado e com dados
-- [ ] Painel CPU Waste Percentage mostra payments com waste alto
-- [ ] `kubectl describe deployment payments-api -n payments` testado
+- [ ] Dashboard rightsizing (`finops-ai-rightsizing.json`) importado e com dados *(vídeo 2.5)*
+- [ ] Port-forward do Grafana ativo *(vídeo 2.5)*
+- [ ] Painel CPU Waste Percentage mostra payments com waste alto *(vídeo 2.5)*
+- [ ] `kubectl describe deployment payments-api -n payments` testado *(vídeo 2.5)*
 - [ ] Seção da Aula 2 no manual revisada (vídeos 2.1–2.5)
 
 ### Aula 3 — Anomalias

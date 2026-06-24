@@ -117,8 +117,8 @@ Responda em português do Brasil:
 3. KPIs para medir sucesso após 30 dias (utilização, incidentes, custo alocado).
 4. Uma frase de "por que agora" conectando eficiência operacional e margem do produto."""),
 
-    ("02", "2.2", "rightsizing-payments-api", "Rightsizing do payments-api", False,
-     "Dashboard `finops-ai-rightsizing.json`. Opcional: `./scripts/collect-lab-context.sh` para dados ao vivo.",
+    ("02", "2.2", "rightsizing-payments-api", "Rightsizing baseado em comportamento real de workloads", False,
+     "Sem demo. Citar `payments-api` com os dados de exemplo do prompt (requests vs uso real). Demo no Grafana fica para o vídeo 2.5.",
      """Você é um SRE com foco em rightsizing de workloads Kubernetes em produção.
 
 Analise o deployment payments-api (namespace payments) e sugira novos requests/limits.
@@ -143,8 +143,8 @@ Responda em português do Brasil:
 4. Plano de rollout: ordem, monitoração durante 48h, critério de rollback.
 5. Estimativa de economia relativa se o custo for proporcional aos requests (compare antes/depois em %)."""),
 
-    ("02", "2.3", "automacao-vpa", "Automação e VPA/Recommendation", False,
-     "Conceitual. Mencionar `kubectl describe deployment payments-api -n payments`.",
+    ("02", "2.3", "automacao-vpa", "Ajustando recursos com automação operacional", False,
+     "Sem demo. Conceitual — fluxo métrica → IA → GitOps no `payments-api`. Demo com terminal e dashboard fica para o vídeo 2.5.",
      """Sou DevOps avaliando automação de rightsizing no cluster FinOps AI Lab (payments, users, staging).
 
 Hoje os requests são definidos manualmente no YAML. Uso Prometheus para métricas reais.
