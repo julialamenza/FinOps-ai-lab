@@ -19,7 +19,7 @@ def render_video(v: tuple) -> str:
     vid, title, tipo, tempo, objetivo, slides, mostrar, cmds, prompt_rel, opcional = v
     aula = vid.split(".")[0]
     _, dashboard = AULA_META[aula]
-    if aula == "2" and tipo == "T":
+    if aula in ("2", "3", "4", "5") and tipo.startswith("T"):
         dashboard_cell = "—"
     else:
         dashboard_cell = f"`{dashboard}`"
@@ -140,7 +140,7 @@ def main() -> None:
         if aula != current_aula:
             current_aula = aula
             titulo, dash = AULA_META[aula]
-            dash_note = f" *(vídeo {aula}.5)*" if aula == "2" else ""
+            dash_note = f" *(vídeo {aula}.5)*" if aula in ("2", "3", "4", "5") else ""
             parts.extend([
                 f"## Aula {aula} — {titulo}",
                 "",

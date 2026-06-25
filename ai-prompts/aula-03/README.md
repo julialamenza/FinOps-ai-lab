@@ -4,8 +4,8 @@ Prompts organizados **um por vídeo**. Abra o arquivo do vídeo que está gravan
 
 | Vídeo | Arquivo | Tema |
 |-------|---------|------|
-| 3.1 | `3.1-deteccao-anomalia-cpu.md` | Detecção de anomalia de CPU |
-| 3.2 | `3.2-investigacao-anomalia-cpu.md` | Investigação de anomalia de CPU (dados ao vivo) |
-| 3.3 | `3.3-capacity-planning.md` | Capacity planning após incidente |
-| 3.4 | `3.4-anomalia-silenciosa-staging.md` | Anomalia silenciosa em staging |
-| 3.5 | `3.5-runbook-anomalias.md` | Runbook de resposta a anomalias |
+| 3.1 | `3.1-deteccao-anomalia-cpu.md` | Fundamentos de anomalias operacionais |
+| 3.2 | `3.2-investigacao-anomalia-cpu.md` | Detecção, investigação e correlação de anomalias |
+| 3.3 | `3.3-capacity-planning.md` | Capacity planning baseado em histórico |
+| 3.4 | `3.4-anomalia-silenciosa-staging.md` | Uso de IA para investigação e projeções |
+| 3.5 | `3.5-runbook-anomalias.md` | Hands-on — anomalias e capacity planning operacional |

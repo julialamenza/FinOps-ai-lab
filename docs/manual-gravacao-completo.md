@@ -47,9 +47,9 @@ minikube start --cpus=4 --memory=8192
 |------|-----------|---------------|
 | 1 | `grafana/dashboards/finops-ai-lab.json` | Grafana (vídeos 1.3+) |
 | 2 | `grafana/dashboards/finops-ai-rightsizing.json` | Grafana (vídeo 2.5) |
-| 3 | `grafana/dashboards/finops-ai-anomalies.json` | Grafana (todos) |
-| 4 | `grafana/dashboards/finops-ai-governance.json` | Grafana (4.2+) + OpenCost (4.3, 4.5) |
-| 5 | `Todos os dashboards anteriores` | Grafana (5.1, 5.5) + OpenCost (5.5) |
+| 3 | `grafana/dashboards/finops-ai-anomalies.json` | Grafana (vídeo 3.5) |
+| 4 | `grafana/dashboards/finops-ai-governance.json` | Grafana + OpenCost (vídeo 4.5) |
+| 5 | `Todos os dashboards anteriores` | Grafana + OpenCost (vídeo 5.5) |
 
 ### Legenda de tipos
 
@@ -613,235 +613,195 @@ Responda em português do Brasil:
 
 ## Aula 3 — Anomalias de custo e capacity planning operacional
 
-**Dashboard:** `grafana/dashboards/finops-ai-anomalies.json` | **Port-forwards:** Grafana (todos)
+**Dashboard:** `grafana/dashboards/finops-ai-anomalies.json` *(vídeo 3.5)* | **Port-forwards:** Grafana (vídeo 3.5)
 
-### Vídeo 3.1 — Detectando comportamento anormal de consumo
+### Vídeo 3.1 — Fundamentos de anomalias operacionais
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-03/3.1-deteccao-anomalia-cpu.md` |
 
-**Objetivo:** Explicar baseline, desvio e detecção de anomalias operacionais.
+**Objetivo:** Explicar o que é anomalia operacional e a diferença entre anomalia e incidente.
 
 **Slides:**
-- Slide 1: Introdução — anomalias operacionais
-- Slide 2: Baseline e detecção de desvio
-- Slide 3: Comportamento anormal de consumo
+- Slide 1: Anomalias de Custo e Capacity Planning Operacional
+- Slide 2: O que é uma Anomalia Operacional?
+- Slide 3: Incidente vs. Anomalia: Entendendo a Diferença
 
 **O que mostrar:**
 - Slides 1–3.
-- Grafana → `finops-ai-anomalies.json` → **Last 15 minutes**.
-- Painel Payments CPU Timeline — baseline, **sem** cpu-spike ativo.
+- Conceitual — baseline, desvio e detecção.
+- Citar `cpu-spike` como exemplo do lab.
+- Demo no Grafana e terminal fica para o vídeo 3.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-# Grafana → finops-ai-anomalies.json → Last 15 minutes
-# Painel: Payments CPU Timeline (sem cpu-spike)
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Dashboard sem spike ativo — baseline. Use dados de exemplo abaixo.
+Sem demo. Slides 1–3. Citar `cpu-spike` como exemplo do lab. Demo no Grafana e terminal fica para o vídeo 3.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Você é um SRE investigando um spike de CPU no namespace payments.
+Estou gravando o vídeo 3.1 (slides 1–3: o que é anomalia operacional, incidente vs. anomalia) no FinOps AI Lab.
 
-Timeline (UTC):
-- 14:00 — CPU payments: ~140 mCPU total (baseline)
-- 14:05 — deploy manual do workload cpu-spike (1 réplica)
-- 14:06 — CPU payments: ~2100 mCPU total (+1400% vs. baseline)
-- 14:06 — payments-api estável em ~145 mCPU (2 pods)
-- 14:20 — sem novos deploys em users ou staging
-
-Workloads no namespace payments:
-- payments-api: 2 réplicas, nginx, requests 1000m CPU
-- cpu-spike: 1 réplica, stress --cpu 2, requests 500m, limits 2000m
+Contexto: cluster Minikube com namespaces payments, users e staging. O workload cpu-spike simula anomalia de CPU no namespace payments.
 
 Responda em português do Brasil:
-1. A anomalia é legítima (carga real) ou provável misconfiguration/teste esquecido?
-2. Passos de triagem em ordem (kubectl, métricas, logs, change calendar).
-3. Impacto no cluster Minikube (4 CPUs): risco de contenção com outros namespaces?
-4. Ação imediata recomendada e ação preventiva (alerta, quota, policy).
-5. Como documentar o incidente em um postmortem leve (template 5 linhas).
+1. Definição de anomalia operacional em FinOps/Kubernetes (CPU, memória, custo).
+2. Diferença prática entre anomalia e incidente — com exemplos do lab.
+3. O que é baseline e como detectar desvio estatisticamente significativo.
+4. Por que nem toda anomalia vira incidente — e por que toda anomalia de custo merece investigação.
+5. Uma pergunta provocativa para a audiência antes do hands-on (vídeo 3.5).
 ```
 
 \newpage
 
-### Vídeo 3.2 — Investigando origem de anomalias operacionais
+### Vídeo 3.2 — Detecção, investigação e correlação de anomalias
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T++** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-03/3.2-investigacao-anomalia-cpu.md` |
 
-**Objetivo:** Demonstrar processo de investigação: detectar → correlacionar → isolar causa.
+**Objetivo:** Apresentar detecção com Prometheus/Grafana, investigação de spikes e correlação com mudanças.
 
 **Slides:**
-- Slide 4: Investigando origem de anomalias
-- Slide 5: Correlação de eventos e métricas
-- Slide 6: Processo de triagem
+- Slide 4: Detectando Comportamento Anormal com Prometheus e Grafana
+- Slide 5: Investigando a Origem de Spikes de Consumo
+- Slide 6: Correlação entre Mudanças e Consumo
 
 **O que mostrar:**
 - Slides 4–6.
-- Ativar spike com `start-anomaly.sh`.
-- Terminal: pods e `kubectl top` em payments.
-- Grafana → CPU Spike Detector (~30s).
-- Explicar que `cpu-spike` simula anomalia.
-- Encerrar com `stop-anomaly.sh`.
+- Explicar fluxo detectar → correlacionar → isolar causa com dados do prompt.
+- Gráficos do slide = exemplo conceitual; demo ao vivo fica para o vídeo 3.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-./scripts/start-anomaly.sh
-kubectl get pods -n payments
-kubectl top pods -n payments
-# Grafana → CPU Spike Detector (~30s)
-./scripts/stop-anomaly.sh
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Com spike ativo. Rode `./scripts/start-anomaly.sh` e `./scripts/collect-anomaly-context.sh` — cole a saída no lugar dos dados de exemplo.
+Sem demo. Slides 4–6. Use os dados de exemplo abaixo. Demo ao vivo fica para o vídeo 3.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Você é um SRE investigando um spike de CPU no namespace payments.
+Estou gravando o vídeo 3.2 (slides 4–6: detecção, investigação de spikes, correlação com mudanças).
 
-Timeline (UTC):
+Timeline ilustrativa (UTC):
 - 14:00 — CPU payments: ~140 mCPU total (baseline)
 - 14:05 — deploy manual do workload cpu-spike (1 réplica)
 - 14:06 — CPU payments: ~2100 mCPU total (+1400% vs. baseline)
 - 14:06 — payments-api estável em ~145 mCPU (2 pods)
-- 14:20 — sem novos deploys em users ou staging
 
 Workloads no namespace payments:
-- payments-api: 2 réplicas, nginx, requests 1000m CPU
+- payments-api: 2 réplicas, requests 1000m CPU
 - cpu-spike: 1 réplica, stress --cpu 2, requests 500m, limits 2000m
 
 Responda em português do Brasil:
-1. A anomalia é legítima (carga real) ou provável misconfiguration/teste esquecido?
-2. Passos de triagem em ordem (kubectl, métricas, logs, change calendar).
-3. Impacto no cluster Minikube (4 CPUs): risco de contenção com outros namespaces?
-4. Ação imediata recomendada e ação preventiva (alerta, quota, policy).
-5. Como documentar o incidente em um postmortem leve (template 5 linhas).
+1. Queries PromQL ou painéis Grafana para detectar este spike (conceitual).
+2. Fluxo de investigação em ordem: detectar → correlacionar → isolar causa.
+3. Como correlacionar deploys/mudanças com variação de consumo.
+4. A anomalia é carga legítima ou misconfiguration/teste esquecido?
+5. Checklist de triagem em 10 minutos (kubectl, métricas, change calendar).
 ```
 
 \newpage
 
-### Vídeo 3.3 — Planejamento operacional de capacidade
+### Vídeo 3.3 — Capacity planning baseado em histórico
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-03/3.3-capacity-planning.md` |
 
-**Objetivo:** Apresentar capacity planning com headroom, allocatable e projeções.
+**Objetivo:** Apresentar capacity planning com headroom, projeções e planejamento pós-incidente.
 
 **Slides:**
-- Slide 7: Capacity planning operacional
-- Slide 8: Headroom e projeções
-- Slide 9: Planejamento pós-incidente
+- Slide 7: Capacity Planning Baseado em Histórico
 
 **O que mostrar:**
-- Slides 7–9.
-- Grafana → painel **Capacity Headroom** no dashboard anomalies.
-- Gráficos do slide = exemplo conceitual.
+- Slide 7.
+- Conceitual — headroom, allocatable e projeções.
+- Painel Capacity Headroom no Grafana fica para o vídeo 3.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-# Grafana → finops-ai-anomalies.json → Capacity Headroom
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Painel Capacity Headroom no dashboard `finops-ai-anomalies.json`.
+Sem demo. Slide 7 — Capacity Planning Baseado em Histórico. Painel Capacity Headroom no Grafana fica para o vídeo 3.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Após o incidente com cpu-spike no namespace payments, projete capacidade do cluster para os próximos 90 dias.
+Estou gravando o vídeo 3.3 (slide 7 — Capacity Planning Baseado em Histórico).
 
-Estado atual do cluster (Minikube, 4 CPU / 8 Gi RAM):
+Após incidente com cpu-spike no namespace payments, projete capacidade do cluster para os próximos 90 dias.
+
+Estado atual (Minikube, 4 CPU / 8 Gi RAM):
 - Alocação por requests: payments ~2200m, users ~200m, staging ~500m, sistema ~800m
 - Uso real médio: payments ~200m, users ~100m, staging ~30m
-- Crescimento esperado: users-api +30% tráfego em 90 dias; payments estável; staging pode ganhar novo workload de testes
+- Crescimento esperado: users-api +30% tráfego em 90 dias; payments estável
 
 Responda em português do Brasil:
-1. O cluster tem headroom suficiente hoje? Quantifique em CPU e memória.
-2. Em que cenário um novo spike como cpu-spike derruba scheduling (Pending pods)?
+1. O cluster tem headroom suficiente hoje? Quantifique CPU e memória.
+2. Em que cenário um novo spike derruba scheduling (Pending pods)?
 3. Projeção de uso em 90 dias (tabela por namespace).
-4. Recomendações: expandir cluster, quotas por namespace, limitRange, PriorityClass?
-5. Quando escalar horizontalmente o node pool vs. rightsizing primeiro?
+4. Recomendações: expandir cluster, quotas, limitRange, PriorityClass?
+5. Quando escalar node pool vs. rightsizing primeiro?
 ```
 
 \newpage
 
-### Vídeo 3.4 — Otimizando uso de recursos em cloud
+### Vídeo 3.4 — Uso de IA para investigação e projeções
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T++** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-03/3.4-anomalia-silenciosa-staging.md` |
 
-**Objetivo:** Discutir estratégias de otimização pós-anomalia e prevenção.
+**Objetivo:** Mostrar como a IA acelera investigação de anomalias e projeções de capacidade/custo.
 
 **Slides:**
-- Slide 10: Otimização de recursos pós-anomalia
-- Slide 11: Anomalias silenciosas de custo
-- Slide 12: Prevenção e políticas
+- Slide 8: Uso de IA para Investigação e Projeções
 
 **O que mostrar:**
-- Slides 10–12.
-- Ativar `start-staging-anomaly.sh`.
-- Terminal: jobs `backup-sync` em staging.
-- Mostrar staging-api estável, mas jobs geram rajadas de CPU/custo.
-- Encerrar com `stop-staging-anomaly.sh`.
+- Slide 8.
+- Conceitual — IA como copiloto na investigação e projeções.
+- Demo com `collect-anomaly-context.sh` fica para o vídeo 3.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-./scripts/start-staging-anomaly.sh
-kubectl get jobs -n staging -l app=backup-sync
-kubectl top pods -n staging
-./scripts/stop-staging-anomaly.sh
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Com `./scripts/start-staging-anomaly.sh` ativo. Encerre com `./scripts/stop-staging-anomaly.sh`.
+Sem demo. Slide 8 — Uso de IA para Investigação e Projeções. Demo com `collect-anomaly-context.sh` fica para o vídeo 3.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-O namespace staging não teve spike de CPU, mas o custo alocado subiu 22% na última semana sem deploy novo visível.
+Estou gravando o vídeo 3.4 (slide 8 — Uso de IA para Investigação e Projeções) no FinOps AI Lab.
 
-Dados:
-- staging-api: 1 réplica, requests 500m CPU / 512 Mi, uso médio 28m CPU
-- Novo CronJob detectado: backup-sync (no lab: a cada 2 min; em produção: ~15 min — pico ~400m CPU por ~90s)
-- Labels: team=platform, environment=staging, cost-center=engineering
-- Nenhuma mudança em payments ou users
+Contexto: após detectar anomalias de CPU (cpu-spike) e de custo silencioso (CronJob backup-sync em staging), quero usar IA como copiloto.
 
 Responda em português do Brasil:
-1. Por que este é um caso de "anomalia de custo" e não de "incidente de disponibilidade"?
-2. Como correlacionar CronJobs/Jobs com custo no OpenCost e no Prometheus?
-3. O staging-api ainda deve ser rightsized ou o problema é o CronJob?
-4. Políticas de governança que evitariam CronJobs órfãos em staging.
-5. Mensagem para o time platform: tom colaborativo, foco em eficiência.
+1. Como a IA acelera investigação de anomalias vs. análise manual (3 casos de uso concretos).
+2. Que dados colar no prompt para a IA ser útil (métricas, timeline, kubectl output)?
+3. Como a IA ajuda em projeções de capacidade e custo — limites e cuidados.
+4. Riscos de confiar cegamente na IA em incidentes operacionais.
+5. Template de prompt reutilizável para investigação de anomalia (5 linhas).
 ```
 
 \newpage
 
-### Vídeo 3.5 — Hands-on — análise de anomalias e capacidade operacional
+### Vídeo 3.5 — Hands-on — anomalias e capacity planning operacional
 
 | Campo | Valor |
 |-------|-------|
@@ -850,16 +810,17 @@ Responda em português do Brasil:
 | Dashboard | `grafana/dashboards/finops-ai-anomalies.json` |
 | Prompt | `ai-prompts/aula-03/3.5-runbook-anomalias.md` |
 
-**Objetivo:** Fluxo completo: baseline → spike → investigação → capacity → encerramento.
+**Objetivo:** Fluxo completo: baseline → spike → investigação → staging → capacity → runbook com IA.
 
 **Slides:**
-Nenhum *(hands-on — apenas lab + dashboard + IA)*
+- Slide 9: Exemplo Prático: Workload cpu-spike
+- Slide 10: Boas Práticas e Preparação para o Hands-on
 
 **O que mostrar:**
-- Sem slides.
+- Slides 9–10.
 - Grafana → `finops-ai-anomalies.json` → **Last 15 minutes**.
-- Fluxo: baseline (business-hours) → spike → Top CPU Consumers → Capacity Headroom.
-- Colar `collect-anomaly-context.sh` no prompt.
+- Fluxo: baseline → `start-anomaly.sh` → Top CPU Consumers → `start-staging-anomaly.sh` → Capacity Headroom.
+- Colar `./scripts/collect-anomaly-context.sh` nos prompts A, B e C.
 - `stop-all-anomalies.sh` → confirmar retorno ao baseline.
 
 **Comandos:**
@@ -870,26 +831,70 @@ kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 ./scripts/start-business-hours-load.sh
 sleep 120
 ./scripts/start-anomaly.sh
+kubectl get pods -n payments
+kubectl top pods -n payments
+./scripts/start-staging-anomaly.sh
+kubectl get jobs -n staging -l app=backup-sync
 ./scripts/collect-anomaly-context.sh
 ./scripts/stop-all-anomalies.sh
 ```
 
 **Antes de colar o prompt:**
-Hands-on. Cole a saída de `./scripts/collect-anomaly-context.sh` no final do prompt, se disponível.
+Hands-on. Slides 9–10. Rode `./scripts/collect-anomaly-context.sh` e cole a saída no bloco abaixo. Percorra o Grafana (`finops-ai-anomalies.json`, Last 15 minutes) antes dos prompts A, B e C.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Crie um runbook operacional para anomalias de custo/consumo no FinOps AI Lab.
+## Contexto ao vivo
 
-Ambiente: Kubernetes, Prometheus, Grafana, OpenCost, namespaces payments/users/staging, script start-anomaly.sh dispara cpu-spike.
+[COLE AQUI A SAÍDA DE ./scripts/collect-anomaly-context.sh]
 
-Responda em português do Brasil, formato runbook para SRE on-call:
-1. Sintomas (o que o alerta ou dashboard mostra).
-2. Diagnóstico em 10 minutos (comandos kubectl e queries Prometheus sugeridas).
+Observações do Grafana (finops-ai-anomalies.json, Last 15 minutes):
+- Baseline com business-hours-load (sem cpu-spike)
+- Spike em payments após start-anomaly.sh — CPU Spike Detector
+- Jobs backup-sync em staging (anomalia silenciosa de custo)
+- Painel Capacity Headroom após incidentes
+
+---
+
+## Prompt A — Investigação do cpu-spike (slide 9)
+
+Você é um SRE. Com base no contexto coletado acima e no dashboard Grafana, investigue o spike de CPU no namespace payments.
+
+Responda em português do Brasil:
+1. A anomalia é legítima ou misconfiguration/teste esquecido?
+2. Passos de triagem em ordem (kubectl, métricas, logs).
+3. Impacto no cluster Minikube (4 CPUs): risco de contenção?
+4. Ação imediata e ação preventiva (alerta, quota, policy).
+5. Postmortem leve (template 5 linhas).
+
+---
+
+## Prompt B — Anomalia silenciosa em staging
+
+O namespace staging teve aumento de custo alocado sem spike visível no staging-api.
+
+Dados do contexto acima + observação: CronJob backup-sync com rajadas de CPU.
+
+Responda em português do Brasil:
+1. Por que é "anomalia de custo" e não incidente de disponibilidade?
+2. Como correlacionar CronJobs/Jobs com custo no OpenCost/Prometheus?
+3. Rightsizing do staging-api ou o problema é o CronJob?
+4. Políticas de governança que evitariam CronJobs órfãos.
+5. Mensagem colaborativa para o time platform.
+
+---
+
+## Prompt C — Runbook e capacity planning (slide 10)
+
+Com base nos prompts A e B, crie um runbook operacional para anomalias de custo/consumo no FinOps AI Lab.
+
+Responda em português do Brasil, formato runbook SRE on-call:
+1. Sintomas (alerta ou dashboard).
+2. Diagnóstico em 10 minutos (comandos kubectl e queries PromQL).
 3. Mitigação imediata (scale down, delete pod, isolate namespace).
-4. Comunicação (quem acionar: payments, platform, FinOps).
-5. Encerramento e follow-up (ticket, ajuste de alerta, lição aprendida).
+4. Comunicação (payments, platform, FinOps).
+5. Encerramento e follow-up.
 6. Seção "Quando NÃO agir" — falsos positivos comuns.
 ```
 
@@ -897,41 +902,83 @@ Responda em português do Brasil, formato runbook para SRE on-call:
 
 ## Aula 4 — Governança operacional e visibilidade de custos
 
-**Dashboard:** `grafana/dashboards/finops-ai-governance.json` | **Port-forwards:** Grafana (4.2+) + OpenCost (4.3, 4.5)
+**Dashboard:** `grafana/dashboards/finops-ai-governance.json` *(vídeo 4.5)* | **Port-forwards:** Grafana + OpenCost (vídeo 4.5)
 
-### Vídeo 4.1 — Ownership e responsabilidade sobre consumo cloud
+### Vídeo 4.1 — Por que governança de custos em Kubernetes
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-04/4.1-auditoria-labels.md` |
 
-**Objetivo:** Explicar ownership, responsabilidade e accountability sobre consumo.
+**Objetivo:** Explicar por que observabilidade sozinha não basta e o desafio de atribuição de custos.
 
 **Slides:**
-- Slide 1: Introdução — governança FinOps
-- Slide 2: Ownership e responsabilidade
-- Slide 3: Accountability sobre consumo cloud
+- Slide 1: Governança Operacional e Visibilidade de Custos
+- Slide 2: Por Que Observabilidade Sozinha Não É Suficiente?
+- Slide 3: O Desafio da Atribuição de Custos em Kubernetes
 
 **O que mostrar:**
 - Slides 1–3.
-- Terminal: `kubectl get ns --show-labels` — team, environment, cost-center.
+- Conceitual — accountability e visibilidade de custos.
+- Demo com labels e OpenCost fica para o vídeo 4.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-kubectl get ns --show-labels
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Rode `./scripts/collect-lab-context.sh` e substitua a tabela de labels pelos dados reais.
+Sem demo. Slides 1–3. Demo com labels e OpenCost fica para o vídeo 4.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Você é Platform Engineer responsável por governança de custos em Kubernetes.
+Estou gravando o vídeo 4.1 (slides 1–3: governança, limites da observabilidade, atribuição de custos).
+
+Contexto: cluster Kubernetes compartilhado (payments, users, staging) com Prometheus, Grafana e OpenCost.
+
+Responda em português do Brasil:
+1. Por que observabilidade sozinha não responde "quanto custa cada time/workload"?
+2. Três desafios de atribuição de custo em clusters Kubernetes compartilhados.
+3. Diferença entre visibilidade técnica e accountability financeira.
+4. O que muda na operação quando existe governança de custos estruturada.
+5. Pergunta provocativa para engajar a audiência antes do hands-on (vídeo 4.5).
+```
+
+\newpage
+
+### Vídeo 4.2 — Labels, ownership e OpenCost na prática
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | **T** |
+| Tempo | 10–12 min |
+| Dashboard | — |
+| Prompt | `ai-prompts/aula-04/4.2-politica-ambientes.md` |
+
+**Objetivo:** Apresentar labels como fundação, modelos de custeio e alocação com OpenCost.
+
+**Slides:**
+- Slide 4: Labels como Fundação da Governança
+- Slide 5: Ownership, Accountability e Modelos de Custeio
+- Slide 6: OpenCost na Prática
+
+**O que mostrar:**
+- Slides 4–6.
+- Conceitual — showback vs chargeback e alocação por namespace.
+- Gráficos do slide = exemplo conceitual; demo no Grafana/OpenCost fica para o vídeo 4.5.
+- Sem terminal.
+
+**Comandos:** Nenhum.
+
+**Antes de colar o prompt:**
+Sem demo. Slides 4–6. Use a tabela de labels abaixo. Demo no Grafana/OpenCost fica para o vídeo 4.5.
+
+**Prompt IA — copiar e colar:**
+
+```
+Estou gravando o vídeo 4.2 (slides 4–6: labels, ownership, OpenCost).
 
 Labels atuais dos namespaces:
 
@@ -941,177 +988,107 @@ Labels atuais dos namespaces:
 | users     | users    | prod        | product      |
 | staging   | platform | staging     | engineering  |
 
-Workloads herdam labels de team e environment nos pods. Não há label owner nem service-tier.
-
 Responda em português do Brasil:
-1. Score de maturidade de labeling (0–10) com gaps críticos.
+1. Score de maturidade de labeling (0–10) e gaps críticos.
 2. Labels adicionais recomendados para FinOps (nome, exemplo, obrigatoriedade).
-3. Como mapear ownership quando team=platform mas o workload é de outro squad?
-4. Impacto de labels ausentes na alocação do OpenCost e em relatórios de showback.
-5. Plano de 30 dias para corrigir governança sem bloquear deploys (admission policy gradual).
+3. Showback vs. chargeback neste cenário — qual fase e por quê?
+4. Como o OpenCost traduz métricas de consumo em custo por namespace/workload.
+5. Plano de 30 dias para corrigir governança sem bloquear deploys.
 ```
 
 \newpage
 
-### Vídeo 4.2 — Classificação operacional de recursos e ambientes
+### Vídeo 4.3 — Visibilidade para diferentes personas
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
-| Prompt | `ai-prompts/aula-04/4.2-politica-ambientes.md` |
-
-**Objetivo:** Apresentar classificação por team, environment, cost-center e service-tier.
-
-**Slides:**
-- Slide 4: Classificação de recursos
-- Slide 5: Tagging (team, environment, cost-center)
-- Slide 6: Política prod vs staging
-
-**O que mostrar:**
-- Slides 4–6.
-- Grafana → `finops-ai-governance.json` → painel **Governance Matrix**.
-
-**Comandos:**
-
-```bash
-# Grafana → finops-ai-governance.json → Governance Matrix
-```
-
-**Antes de colar o prompt:**
-Painel Governance Matrix no dashboard `finops-ai-governance.json`.
-
-**Prompt IA — copiar e colar:**
-
-```
-Avalie a governança do ambiente staging frente a payments e users (prod).
-
-Fatos:
-- staging: environment=staging, cost-center=engineering, 1 réplica staging-api, uso CPU ~5% do request
-- payments/users: environment=prod, cost-center=product, SLO implícito de disponibilidade
-- Custo alocado de staging ≈ 29% do total com utilização real baixa
-- Time platform argumenta que staging "precisa estar sempre disponível para QA"
-
-Responda em português do Brasil:
-1. A política atual é sustentável? Alternativas (auto shutdown, cluster separado, namespaces efêmeros).
-2. Regras claras: o que pode e não pode rodar em staging (CPU stress, jobs longos, réplicas ociosas).
-3. Como negociar com QA/Platform sem comprometer qualidade de release?
-4. Template de política de namespace (1 página, bullets objetivos).
-5. Indicadores para revisar a política trimestralmente.
-```
-
-\newpage
-
-### Vídeo 4.3 — Alocação de custos orientada por contexto
-
-| Campo | Valor |
-|-------|-------|
-| Tipo | **T+** |
-| Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-04/4.3-showback-chargeback.md` |
 
-**Objetivo:** Explicar showback, chargeback e alocação por contexto operacional.
+**Objetivo:** Mostrar como entregar a informação certa para SRE, FinOps e Engineering Manager.
 
 **Slides:**
-- Slide 7: Showback
-- Slide 8: Chargeback
-- Slide 9: Alocação orientada por contexto
+- Slide 7: Visibilidade para Diferentes Personas
 
 **O que mostrar:**
-- Slides 7–9.
-- Grafana → painel **Showback View**.
-- OpenCost → `http://localhost:9003` (Allocation, Namespace Costs).
-- Opcional: screenshot AWS Cost Explorer.
+- Slide 7.
+- Conceitual — dashboards e rituais por persona.
+- Demo no Grafana fica para o vídeo 4.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-kubectl port-forward -n opencost svc/opencost 9003:9090
-# Grafana → Showback View | http://localhost:9003
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Painel Showback View + OpenCost (`localhost:9003`).
+Sem demo. Slide 7 — Visibilidade para Diferentes Personas. Demo no Grafana fica para o vídeo 4.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Preciso explicar showback e chargeback para times de produto usando dados do lab.
+Estou gravando o vídeo 4.3 (slide 7 — Visibilidade para Diferentes Personas).
 
-Alocação de custo mensal estimada (didática):
-- payments (team=payments, cost-center=product): R$ 12.400 — 62% do total
-- users (team=users, cost-center=product): R$ 1.800 — 9%
-- staging (team=platform, cost-center=engineering): R$ 5.800 — 29%
+Personas:
+- SRE on-call: desperdício e risco de saturação
+- FinOps analyst: alocação por time e cost-center
+- Engineering Manager: priorizar backlog de eficiência
 
-Contexto:
-- payments-api overprovisionado é o principal driver de custo em payments
-- staging tem baixo uso real mas requests altos
-- Empresa quer accountability sem transferir dinheiro entre departamentos ainda (fase 1)
+Dados disponíveis no lab: Prometheus, Grafana (finops-ai-governance.json), OpenCost, labels nos namespaces.
 
 Responda em português do Brasil:
-1. Neste cenário, showback ou chargeback? Justifique.
-2. Como apresentar o relatório para o time payments sem parecer punição?
-3. Métricas de eficiência por cost-center (custo por request, custo por réplica, % de utilização).
-4. Roadmap em 3 fases: visibilidade → metas → chargeback opcional.
-5. Script de 1 minuto para gravar no curso explicando a diferença dos modelos.
+1. Um dashboard ou view por persona (métricas, filtros, frequência).
+2. Perguntas que cada persona responde em menos de 2 minutos.
+3. Como o EM do time payments interpreta ser ~62% do custo alocado.
+4. Rituais: daily (SRE), weekly (FinOps), monthly (EM + platform).
+5. Erros comuns ao expor custo para engenharia.
 ```
 
 \newpage
 
-### Vídeo 4.4 — Guardrails e políticas de eficiência operacional
+### Vídeo 4.4 — AWS Cost Explorer e OpenCost — visões complementares
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `grafana/dashboards/finops-ai-governance.json` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-04/4.4-guardrails.md` |
 
-**Objetivo:** Apresentar ResourceQuota, LimitRange, labels obrigatórios e políticas Kyverno/OPA.
+**Objetivo:** Explicar como Cost Explorer e OpenCost se complementam na visão de custo.
 
 **Slides:**
-- Slide 10: Guardrails e políticas
-- Slide 11: ResourceQuota, LimitRange, OPA/Kyverno
-- Slide 12: Eficiência sem atrito
+- Slide 8: AWS Cost Explorer + OpenCost: Visões Complementares
 
 **O que mostrar:**
-- Slides 10–12.
-- Grafana → painel **Guardrails Checklist** (conceitual — não deployado no lab).
+- Slide 8.
+- Conceitual — infra cloud vs camada Kubernetes.
+- Opcional: screenshot AWS Cost Explorer.
+- Demo ao vivo fica para o vídeo 4.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-# Grafana → finops-ai-governance.json → Guardrails Checklist
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Painel Guardrails Checklist no dashboard governance.
+Sem demo. Slide 8 — AWS Cost Explorer + OpenCost. Opcional: screenshot AWS. Demo ao vivo fica para o vídeo 4.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Proponha guardrails de governança para o cluster FinOps AI Lab.
+Estou gravando o vídeo 4.4 (slide 8 — AWS Cost Explorer + OpenCost: Visões Complementares).
 
-Problemas observados:
-- Deploy de cpu-spike em payments sem label de ambiente=ephemeral
-- staging-api com requests de produção mas tráfego de homologação
-- Nenhuma ResourceQuota por namespace
-- Times podem criar workloads em qualquer namespace com RBAC amplo
+Contexto: Cost Explorer mostra custo na camada cloud; OpenCost aloca na camada Kubernetes.
 
-Responda em português do Brasil para DevOps/Platform:
-1. Top 5 guardrails priorizados (quota, limitRange, OPA/Gatekeeper, labels obrigatórios, etc.).
-2. Para cada guardrail: o que bloqueia, o que apenas alerta, esforço de implementação.
-3. Exemplo de ResourceQuota para staging vs. payments (valores sugeridos).
-4. Política de labels obrigatórios: validação no admission webhook.
-5. Como medir se os guardrails estão funcionando (KPIs em 60 dias).
+Responda em português do Brasil:
+1. O que cada ferramenta responde que a outra não responde.
+2. Como cruzar fatura AWS com alocação por namespace no OpenCost.
+3. Cenário didático: custo AWS subiu 10% — onde investigar primeiro?
+4. Limitações do OpenCost em cluster local (Minikube) vs. produção EKS.
+5. Script de 1 minuto para gravar explicando as visões complementares.
 ```
 
 \newpage
 
-### Vídeo 4.5 — Hands-on — dashboard operacional de custos e governança
+### Vídeo 4.5 — Hands-on — governança e visibilidade de custos
 
 | Campo | Valor |
 |-------|-------|
@@ -1120,270 +1097,270 @@ Responda em português do Brasil para DevOps/Platform:
 | Dashboard | `grafana/dashboards/finops-ai-governance.json` |
 | Prompt | `ai-prompts/aula-04/4.5-visibilidade-persona.md` |
 
-**Objetivo:** Demonstrar visibilidade completa: labels, showback proxy, OpenCost e governança.
+**Objetivo:** Demonstrar labels, governança, showback, guardrails e OpenCost com dados ao vivo.
 
 **Slides:**
-Nenhum *(hands-on — apenas lab + dashboard + IA)*
+- Slide 9: Guardrails Operacionais: Governança sem Burocracia
+- Slide 10: Laboratório Prático: payments, users e staging
 
 **O que mostrar:**
-- Sem slides.
-- Grafana → Matrix, Showback, Guardrails.
-- OpenCost → custo por namespace/workload.
-- Colar `collect-lab-context.sh` no prompt.
-- Opcional: comparar com screenshot AWS Cost Explorer.
+- Slides 9–10.
+- Terminal: `kubectl get ns --show-labels`.
+- Grafana → `finops-ai-governance.json` → Matrix, Showback, Guardrails.
+- OpenCost → `http://localhost:9003`.
+- Colar `./scripts/collect-lab-context.sh` nos prompts A, B e C.
 
 **Comandos:**
 
 ```bash
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
-./scripts/collect-lab-context.sh
 kubectl get ns --show-labels
+./scripts/collect-lab-context.sh
 ```
 
 **Antes de colar o prompt:**
-Hands-on. Rode `./scripts/collect-lab-context.sh` e substitua dados de exemplo, se aplicável.
+Hands-on. Slides 9–10. Rode `./scripts/collect-lab-context.sh` e cole a saída no bloco abaixo. Percorra Grafana (`finops-ai-governance.json`) e OpenCost antes dos prompts A, B e C.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Desenhe visibilidade de custos para três personas usando payments, users e staging.
+## Contexto ao vivo
 
-Personas:
-- SRE on-call: precisa achar desperdício e risco de saturação rápido
-- FinOps analyst: precisa alocar custo por time e cost-center
-- Engineering Manager do produto: precisa priorizar backlog de eficiência
+[COLE AQUI A SAÍDA DE ./scripts/collect-lab-context.sh]
 
-Dados disponíveis: Prometheus, Grafana (dashboard finops-ai-lab.json), OpenCost, labels nos namespaces.
+Observações do Grafana (finops-ai-governance.json, Last 15 minutes):
+- Governance Matrix — labels por namespace
+- Showback View — custo alocado por cost-center
+- Guardrails Checklist — gaps de governança
+
+OpenCost (http://localhost:9003): alocação por namespace/workload.
+
+---
+
+## Prompt A — Auditoria de labels e ownership (slides 4–6)
+
+Com base no contexto coletado, avalie a governança de labels e ownership.
 
 Responda em português do Brasil:
-1. Um dashboard ou view por persona (métricas, filtros, frequência de revisão).
-2. Perguntas que cada persona deve conseguir responder em menos de 2 minutos.
-3. Como o EM do time payments deve interpretar que seu namespace é 62% do custo.
-4. Rituais recomendados: daily (SRE), weekly (FinOps), monthly (EM + platform).
-5. Erros comuns ao expor custo para engenharia (e como evitar).
+1. Score de maturidade (0–10) com gaps críticos nos dados reais.
+2. Labels adicionais recomendados (owner, service-tier).
+3. Impacto de labels ausentes no OpenCost e showback.
+4. Como mapear ownership quando team=platform em staging.
+5. Top 3 correções prioritárias.
+
+---
+
+## Prompt B — Showback e visibilidade por persona (slide 7)
+
+Use os dados do OpenCost e Grafana para explicar showback aos times.
+
+Responda em português do Brasil:
+1. Alocação estimada por namespace/cost-center com os dados ao vivo.
+2. Showback ou chargeback neste estágio — justificativa.
+3. View recomendada para SRE, FinOps e EM (1 parágrafo cada).
+4. Como apresentar ao time payments sem parecer punição.
+5. Métricas de eficiência por cost-center.
+
+---
+
+## Prompt C — Guardrails operacionais (slide 9)
+
+Problemas observados no lab: cpu-spike sem label ephemeral, staging overprovisionado, sem ResourceQuota.
+
+Responda em português do Brasil:
+1. Top 5 guardrails priorizados (quota, limitRange, labels obrigatórios, etc.).
+2. Para cada um: bloqueia, alerta ou recomenda — esforço de implementação.
+3. ResourceQuota sugerida para staging vs. payments.
+4. Política de labels obrigatórios no admission webhook.
+5. KPIs para medir eficácia em 60 dias.
 ```
 
 \newpage
 
 ## Aula 5 — Operações cloud orientadas por eficiência
 
-**Dashboard:** `Todos os dashboards anteriores` | **Port-forwards:** Grafana (5.1, 5.5) + OpenCost (5.5)
+**Dashboard:** `Todos os dashboards anteriores` *(vídeo 5.5)* | **Port-forwards:** Grafana + OpenCost (vídeo 5.5)
 
-### Vídeo 5.1 — Relacionando custo, performance e observabilidade
+### Vídeo 5.1 — Revisão do curso e mentalidade de eficiência
 
 | Campo | Valor |
 |-------|-------|
-| Tipo | **T+** |
+| Tipo | **T** |
 | Tempo | 8–10 min |
-| Dashboard | `Todos os dashboards anteriores` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-05/5.1-diagnostico-consolidado.md` |
 
-**Objetivo:** Conectar os três pilares e mostrar trade-offs em decisões operacionais.
+**Objetivo:** Revisar a jornada do curso e consolidar eficiência operacional como disciplina contínua.
 
 **Slides:**
-- Slide 1: Introdução — eficiência operacional contínua
-- Slide 2: Custo × performance × observabilidade
-- Slide 3: Trade-offs operacionais
+- Slide 1: Operações Cloud Orientadas por Eficiência
+- Slide 2: O Que Aprendemos ao Longo do Curso
+- Slide 3: Eficiência Operacional é uma Disciplina, Não um Projeto
 
 **O que mostrar:**
 - Slides 1–3.
-- Tour rápido nos 4 dashboards Grafana (~30s cada).
+- Conceitual — recapitular achados das aulas 1–4.
+- Tour nos dashboards fica para o vídeo 5.5.
+- Sem terminal.
 
-**Comandos:**
-
-```bash
-kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
-# finops-ai-lab → rightsizing → anomalies → governance
-```
+**Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Tour rápido nos 4 dashboards. Opcional: `./scripts/collect-lab-context.sh`.
+Sem demo. Slides 1–3. Recapitular achados das aulas 1–4. Tour nos dashboards fica para o vídeo 5.5.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Você é consultor de FinOps e SRE. Faça diagnóstico consolidado do cluster FinOps AI Lab.
+Estou gravando o vídeo 5.1 (slides 1–3: revisão do curso e eficiência como disciplina).
 
-Stack: Minikube, Prometheus, Grafana, OpenCost.
-
-Namespaces e workloads:
-| NS       | Workload      | Réplicas | CPU req (total) | CPU uso médio | Mem req (total) | Mem uso média | Labels principais                    |
-|----------|---------------|----------|-----------------|---------------|-----------------|---------------|--------------------------------------|
-| payments | payments-api  | 2        | 2000m           | 145m          | 2 Gi            | 176 Mi        | team=payments, env=prod              |
-| payments | cpu-spike*    | 0–1      | 0–500m          | 0–2000m       | 0–128 Mi        | variável      | *anomalia pontual para demo          |
-| users    | users-api     | 2        | 200m            | 96m           | 256 Mi          | 152 Mi        | team=users, env=prod                 |
-| staging  | staging-api   | 1        | 500m            | 28m           | 512 Mi          | 58 Mi         | team=platform, env=staging           |
-
-Achados das aulas anteriores:
-- Over-provisioning crítico em payments-api
-- users-api relativamente saudável
-- staging subutilizado com custo alocado desproporcional
-- Anomalia cpu-spike demonstra gap de alertas e governança
+Jornada do curso:
+- Aula 1: observabilidade de consumo (payments over, users ok, staging sub)
+- Aula 2: rightsizing e automação (VPA, scheduling)
+- Aula 3: anomalias e capacity planning (cpu-spike, backup-sync)
+- Aula 4: governança, labels, OpenCost, showback
 
 Responda em português do Brasil:
-1. Resumo executivo (10 linhas) do estado do ambiente.
-2. Top 5 achados ordenados por impacto em custo e risco operacional.
-3. Quick wins executáveis em 2 semanas.
-4. Iniciativas estruturais para 90 dias.
-5. O que monitorar para provar que a eficiência melhorou (KPIs com metas numéricas).
+1. Resumo da jornada em 8 bullets (1 por conceito-chave).
+2. Três achados consolidados do FinOps AI Lab.
+3. Por que eficiência operacional é disciplina contínua, não projeto pontual.
+4. Armadilhas comuns ao tratar FinOps como iniciativa temporária.
+5. Pergunta provocativa antes do hands-on final (vídeo 5.5).
 ```
 
 \newpage
 
-### Vídeo 5.2 — Tomada de decisão orientada por dados operacionais
+### Vídeo 5.2 — Ciclo da eficiência e IA na operação
 
 | Campo | Valor |
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards anteriores` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-05/5.2-priorizacao-matriz.md` |
 
-**Objetivo:** Apresentar matriz impacto × esforço e priorização de ações.
+**Objetivo:** Apresentar o ciclo de eficiência, o papel da IA e o fluxo orientado por dados.
 
 **Slides:**
-- Slide 4: Tomada de decisão orientada por dados
-- Slide 5: Matriz impacto × esforço
-- Slide 6: Priorização de ações
+- Slide 4: O Ciclo da Eficiência
+- Slide 5: O Papel da IA na Operação Moderna
+- Slide 6: Fluxo Operacional Orientado por Dados
 
 **O que mostrar:**
 - Slides 4–6.
-- Resumir achados do lab em tabela (conceitual).
-- Sem lab obrigatório.
+- Conceitual — observar → analisar → decidir → agir → medir.
+- Sem lab.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Conceitual. Resumir achados do lab em tabela antes de colar.
+Sem demo. Slides 4–6. Conceitual — ciclo, IA e fluxo orientado por dados.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Priorize as ações abaixo usando matriz impacto × esforço × risco.
+Estou gravando o vídeo 5.2 (slides 4–6: ciclo da eficiência, IA na operação, fluxo orientado por dados).
 
-Ações candidatas:
-A. Rightsizing payments-api (CPU 1000m→150m, mem 1Gi→256Mi por pod)
-B. Rightsizing staging-api + janela de desligamento noturno
-C. Implementar ResourceQuota e LimitRange por namespace
-D. Alertas de CPU e custo para anomalias tipo cpu-spike
-E. Dashboards de showback por cost-center no Grafana
-F. VPA em modo recommendation apenas para users-api
-G. Política de labels obrigatórios (admission webhook)
-H. Revisão trimestral de requests com ritual FinOps
+Stack: Minikube, Prometheus, Grafana, OpenCost, IA como copiloto.
 
 Responda em português do Brasil:
-1. Matriz com classificação de cada ação (impacto/esforço/risco).
-2. Sequência recomendada de execução (1ª à 8ª) com justificativa em 1 linha cada.
-3. Dependências entre ações (ex.: alertas antes ou depois de rightsizing?).
-4. Qual ação traz maior valor percebido pelo C-level com menor esforço?
-5. Qual ação você faria primeiro se tivesse apenas 1 dia de trabalho?
+1. Descreva o ciclo de eficiência em 5 etapas (observar → agir → medir).
+2. Papel da IA como copiloto — o que amplifica vs. o que não substitui.
+3. Fluxo operacional orientado por dados: Prometheus → Grafana → OpenCost → IA → ação.
+4. Onde humanos devem manter aprovação obrigatória (ex.: rightsizing em payments).
+5. Exemplo de decisão que atravessa todo o ciclo no FinOps AI Lab.
 ```
 
 \newpage
 
-### Vídeo 5.3 — Eficiência operacional contínua em ambientes modernos
+### Vídeo 5.3 — Métricas que realmente importam
 
 | Campo | Valor |
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards anteriores` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-05/5.3-plano-90-dias.md` |
 
-**Objetivo:** Apresentar ciclo contínuo de eficiência e plano de 90 dias.
+**Objetivo:** Identificar métricas que conectam performance, eficiência e custo.
 
 **Slides:**
-- Slide 7: Eficiência contínua
-- Slide 8: Plano de otimização (90 dias)
-- Slide 9: Forecast e projeção (exemplo conceitual)
+- Slide 7: Métricas que Realmente Importam
 
 **O que mostrar:**
-- Slides 7–9.
+- Slide 7.
+- Conceitual — KPIs operacionais e FinOps.
 - Sem lab.
-- Opcional: screenshot AWS Cost Explorer forecast.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Sem demo. Slides de eficiência contínua.
+Sem demo. Slide 7 — Métricas que Realmente Importam.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Monte um plano de otimização contínua de 90 dias para o FinOps AI Lab, aplicável como modelo em produção real.
+Estou gravando o vídeo 5.3 (slide 7 — Métricas que Realmente Importam).
 
-Times envolvidos:
-- Squad payments (dono payments-api)
-- Squad users (dono users-api)
-- Platform (dono staging, cluster, observabilidade)
-- FinOps (alocação, relatórios, metas)
-
-Restrições:
-- Zero downtime em payments e users
-- Mudanças em staging podem ser mais agressivas
-- Orçamento de engenharia: ~20% de 1 platform engineer + suporte pontual dos squads
+Contexto: operação Kubernetes com FinOps — payments (crítico, overprovisionado), users (saudável), staging (subutilizado).
 
 Responda em português do Brasil:
-1. Roadmap por sprint (12 semanas): tema, entregável, dono, dependência.
-2. Para cada iniciativa: impacto esperado (alto/médio/baixo), risco, esforço.
-3. Rituais FinOps + SRE (review semanal de eficiência, game day de anomalia).
-4. Critérios de "done" para encerrar a fase de otimização.
-5. Como evitar regressão (requests voltarem a inflar após 6 meses).
+1. As 5 métricas essenciais que conectam performance, eficiência e custo.
+2. Para cada métrica: o que revela, fonte (Prometheus/OpenCost), exemplo de query.
+3. Métricas que parecem importantes mas geram ruído — evite.
+4. KPIs por persona: SRE, FinOps, Engineering Manager (1 KPI cada).
+5. Dashboard mínimo viável para review semanal de eficiência.
 ```
 
 \newpage
 
-### Vídeo 5.4 — Construindo uma cultura operacional orientada por eficiência
+### Vídeo 5.4 — Roadmap de maturidade FinOps
 
 | Campo | Valor |
 |-------|-------|
 | Tipo | **T** |
 | Tempo | 10–12 min |
-| Dashboard | `Todos os dashboards anteriores` |
+| Dashboard | — |
 | Prompt | `ai-prompts/aula-05/5.4-recomendacoes-executivas.md` |
 
-**Objetivo:** Fechar o arco do curso com cultura, KPIs e governança de longo prazo.
+**Objetivo:** Apresentar evolução em estágios de maturidade FinOps na organização.
 
 **Slides:**
-- Slide 10: Cultura FinOps
-- Slide 11: KPIs executivos
-- Slide 12: Fechamento do curso
+- Slide 8: Roadmap de Maturidade FinOps
 
 **O que mostrar:**
-- Slides 10–12.
+- Slide 8.
+- Conceitual — estágios de maturidade e desbloqueios.
 - Sem lab.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Sem demo. Slides de cultura FinOps e KPIs.
+Sem demo. Slide 8 — Roadmap de Maturidade FinOps.
 
 **Prompt IA — copiar e colar:**
 
 ```
-Transforme a análise técnica do FinOps AI Lab em recomendações executivas.
+Estou gravando o vídeo 5.4 (slide 8 — Roadmap de Maturidade FinOps).
 
-Números consolidados (estimativa didática, mensal):
-- Custo alocado total: R$ 20.000
-- Potencial de redução identificado: 35–45% em 90 dias sem perda de SLA
-- Maior driver: requests inflados em payments (62% do custo, ~15% de utilização média)
-- Incidente demo cpu-spike: +R$ 14 de custo evitável em 1h com detecção tardia
-- Maturidade de governança: labels básicos ok, faltam quotas, alertas e rituais
-
-Audiência: CTO e VP Engineering — técnica o suficiente, foco em decisão.
+Estado atual do FinOps AI Lab (síntese):
+- Observabilidade: ok (Prometheus, Grafana, 4 dashboards)
+- Rightsizing: oportunidade crítica em payments
+- Anomalias: gap de alertas e runbooks
+- Governança: labels básicos, faltam quotas e guardrails
+- IA: usada pontualmente, sem playbook consolidado
 
 Responda em português do Brasil:
-1. Memo executivo (máximo 250 palavras).
-2. Três decisões que precisam de patrocínio executivo.
-3. Riscos de NÃO agir nos próximos 6 meses (operacional e financeiro).
-4. Investimento necessário (pessoas, ferramentas, tempo) vs. retorno esperado.
-5. Uma métrica norte para acompanhar no board mensal.
+1. Em qual estágio de maturidade FinOps este ambiente está (Crawl/Walk/Run ou similar)?
+2. Quatro estágios de evolução com entregáveis e critérios de avanço.
+3. O que desbloqueia cada estágio (pessoas, processos, ferramentas).
+4. Riscos de pular estágios (ex.: chargeback antes de showback).
+5. Próximo marco recomendado para o lab em 90 dias.
 ```
 
 \newpage
 
-### Vídeo 5.5 — Hands-on — fluxo operacional completo de FinOps com IA
+### Vídeo 5.5 — Hands-on — copiloto de eficiência e plano 30-60-90
 
 | Campo | Valor |
 |-------|-------|
@@ -1392,18 +1369,19 @@ Responda em português do Brasil:
 | Dashboard | `Todos os dashboards anteriores` |
 | Prompt | `ai-prompts/aula-05/5.5-copiloto-eficiencia.md` |
 
-**Objetivo:** Executar fluxo end-to-end: observar → rightsizing → anomalias → governança → plano consolidado com IA.
+**Objetivo:** Executar fluxo end-to-end com IA: dashboards → diagnóstico → plano de ação.
 
 **Slides:**
-Nenhum *(hands-on — apenas lab + dashboard + IA)*
+- Slide 9: O Copiloto de Eficiência: Prompts e Templates
+- Slide 10: Plano de Ação 30-60-90 Dias
 
 **O que mostrar:**
-- Sem slides.
+- Slides 9–10.
 - Percorrer 4 dashboards (1 min cada) → **Last 15 minutes**.
 - Resumo: payments over, users ok, staging sub, anomalias = lição.
 - OpenCost → visão consolidada.
-- Colar `collect-lab-context.sh` no **prompt mestre**.
-- Apresentar plano de 90 dias e KPIs da resposta da IA.
+- Colar `./scripts/collect-lab-context.sh` no **prompt mestre**.
+- Apresentar plano 30-60-90 e KPIs da resposta da IA.
 
 **Comandos:**
 
@@ -1415,7 +1393,7 @@ kubectl top pods -A
 ```
 
 **Antes de colar o prompt:**
-Hands-on final. Cole `./scripts/collect-lab-context.sh` na seção `[DADOS]`. Mostre como salvar como template reutilizável.
+Hands-on final. Slides 9–10. Cole `./scripts/collect-lab-context.sh` na seção `[DADOS]`. Percorra os 4 dashboards Grafana e OpenCost antes de colar.
 
 **Prompt IA — copiar e colar:**
 
@@ -1427,21 +1405,29 @@ Regras:
 - Sempre separar: fato observado, hipótese, recomendação, risco
 - Nunca sugerir mudança em produção sem plano de rollback
 - Priorizar por impacto financeiro e segurança operacional
-- Pedir dados faltantes antes de concluir se eu não informar
 
 Meu ambiente:
 - Cluster: Minikube (4 CPU, 8 Gi RAM)
-- Observabilidade: Prometheus, Grafana, OpenCost
+- Observabilidade: Prometheus, Grafana (4 dashboards), OpenCost
 - Namespaces: payments (payments-api), users (users-api), staging (staging-api)
-- Labels: team, environment, cost-center em cada namespace
+- Labels: team, environment, cost-center
 
-Vou colar métricas atualizadas abaixo. Analise e devolva:
-1. Diagnóstico em 5 bullets
-2. Top 3 ações priorizadas
-3. Comandos kubectl ou queries PromQL úteis para validar
-4. Mensagem curta para o time dono do workload
+[DADOS — cole aqui a saída de ./scripts/collect-lab-context.sh + observações dos 4 dashboards Grafana e OpenCost]
 
-[DADOS — cole aqui métricas do Grafana, OpenCost ou kubectl top]
+Analise e devolva:
+
+## 1. Diagnóstico consolidado (5 bullets)
+
+## 2. Top 3 ações priorizadas (impacto × esforço)
+
+## 3. Plano de Ação 30-60-90 Dias (slide 10)
+- 30 dias: quick wins
+- 60 dias: estruturação (alertas, quotas, rituais)
+- 90 dias: automação e maturidade
+
+## 4. KPIs para acompanhar (slide 7)
+
+## 5. Template de prompt reutilizável (slide 9) — salve como playbook da equipe
 ```
 
 \newpage
@@ -1520,26 +1506,29 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 
 ### Aula 3 — Anomalias
 
-- [ ] Dashboard anomalies (`finops-ai-anomalies.json`) importado e com dados
-- [ ] `./scripts/start-anomaly.sh` testado — spike visível no Grafana em ~30s
-- [ ] `./scripts/start-staging-anomaly.sh` testado — job `backup-sync` criado imediatamente
-- [ ] `./scripts/stop-all-anomalies.sh` testado — baseline restaurado
-- [ ] `./scripts/collect-anomaly-context.sh` testado — saída utilizável nos prompts
+- [ ] Dashboard anomalies (`finops-ai-anomalies.json`) importado e com dados *(vídeo 3.5)*
+- [ ] Port-forward do Grafana ativo *(vídeo 3.5)*
+- [ ] `./scripts/start-anomaly.sh` testado — spike visível no Grafana em ~30s *(vídeo 3.5)*
+- [ ] `./scripts/start-staging-anomaly.sh` testado — job `backup-sync` criado imediatamente *(vídeo 3.5)*
+- [ ] `./scripts/stop-all-anomalies.sh` testado — baseline restaurado *(vídeo 3.5)*
+- [ ] `./scripts/collect-anomaly-context.sh` testado — saída utilizável nos prompts *(vídeo 3.5)*
 - [ ] Seção da Aula 3 no manual revisada (vídeos 3.1–3.5)
 
 ### Aula 4 — Governança
 
-- [ ] Dashboard governance (`finops-ai-governance.json`) importado e com dados
-- [ ] Port-forward do OpenCost ativo (`localhost:9003`)
-- [ ] `kubectl get ns --show-labels` mostra labels team, environment, cost-center
+- [ ] Dashboard governance (`finops-ai-governance.json`) importado e com dados *(vídeo 4.5)*
+- [ ] Port-forwards Grafana + OpenCost ativos *(vídeo 4.5)*
+- [ ] `kubectl get ns --show-labels` mostra labels team, environment, cost-center *(vídeo 4.5)*
+- [ ] `./scripts/collect-lab-context.sh` testado *(vídeo 4.5)*
 - [ ] Seção da Aula 4 no manual revisada (vídeos 4.1–4.5)
 - [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
 
 ### Aula 5 — Eficiência operacional
 
-- [ ] Todos os 4 dashboards acessíveis no Grafana
-- [ ] Port-forwards Grafana + OpenCost ativos
-- [ ] Seção da Aula 5 no manual revisada (vídeo 5.5 — prompt mestre)
+- [ ] Todos os 4 dashboards acessíveis no Grafana *(vídeo 5.5)*
+- [ ] Port-forwards Grafana + OpenCost ativos *(vídeo 5.5)*
+- [ ] `./scripts/collect-lab-context.sh` testado *(vídeo 5.5 — prompt mestre)*
+- [ ] Seção da Aula 5 no manual revisada (vídeos 5.1–5.5)
 - [ ] Achados das aulas 1–4 anotados para o fluxo completo
 - [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
 

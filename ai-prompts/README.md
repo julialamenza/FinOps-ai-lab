@@ -40,21 +40,21 @@ Cada pasta `aula-XX/` tem um `README.md` com a tabela vídeo → arquivo.
 | 2.3 | `aula-02/2.3-automacao-vpa.md` | Automação e VPA |
 | 2.4 | `aula-02/2.4-rollout-hpa-vpa.md` | HPA, VPA e rollout gradual *(opcional)* |
 | 2.5 | `aula-02/2.5-rightsizing-hands-on.md` | Rightsizing *(hands-on)* |
-| 3.1 | `aula-03/3.1-deteccao-anomalia-cpu.md` | Detecção de anomalia |
-| 3.2 | `aula-03/3.2-investigacao-anomalia-cpu.md` | Investigação com spike ao vivo |
-| 3.3 | `aula-03/3.3-capacity-planning.md` | Capacity planning |
-| 3.4 | `aula-03/3.4-anomalia-silenciosa-staging.md` | Anomalia silenciosa staging |
-| 3.5 | `aula-03/3.5-runbook-anomalias.md` | Runbook *(hands-on)* |
-| 4.1 | `aula-04/4.1-auditoria-labels.md` | Auditoria de labels |
-| 4.2 | `aula-04/4.2-politica-ambientes.md` | Política prod vs staging |
-| 4.3 | `aula-04/4.3-showback-chargeback.md` | Showback vs chargeback |
-| 4.4 | `aula-04/4.4-guardrails.md` | Guardrails |
-| 4.5 | `aula-04/4.5-visibilidade-persona.md` | Visibilidade por persona *(hands-on)* |
-| 5.1 | `aula-05/5.1-diagnostico-consolidado.md` | Diagnóstico consolidado |
-| 5.2 | `aula-05/5.2-priorizacao-matriz.md` | Matriz impacto × esforço |
-| 5.3 | `aula-05/5.3-plano-90-dias.md` | Plano 90 dias |
-| 5.4 | `aula-05/5.4-recomendacoes-executivas.md` | Recomendações executivas |
-| 5.5 | `aula-05/5.5-copiloto-eficiencia.md` | **Prompt mestre** *(hands-on)* |
+| 3.1 | `aula-03/3.1-deteccao-anomalia-cpu.md` | Fundamentos de anomalias operacionais |
+| 3.2 | `aula-03/3.2-investigacao-anomalia-cpu.md` | Detecção, investigação e correlação |
+| 3.3 | `aula-03/3.3-capacity-planning.md` | Capacity planning baseado em histórico |
+| 3.4 | `aula-03/3.4-anomalia-silenciosa-staging.md` | Uso de IA para investigação e projeções |
+| 3.5 | `aula-03/3.5-runbook-anomalias.md` | Anomalias *(hands-on)* |
+| 4.1 | `aula-04/4.1-auditoria-labels.md` | Por que governança de custos |
+| 4.2 | `aula-04/4.2-politica-ambientes.md` | Labels, ownership e OpenCost |
+| 4.3 | `aula-04/4.3-showback-chargeback.md` | Visibilidade para diferentes personas |
+| 4.4 | `aula-04/4.4-guardrails.md` | AWS Cost Explorer + OpenCost |
+| 4.5 | `aula-04/4.5-visibilidade-persona.md` | Governança *(hands-on)* |
+| 5.1 | `aula-05/5.1-diagnostico-consolidado.md` | Revisão do curso e mentalidade |
+| 5.2 | `aula-05/5.2-priorizacao-matriz.md` | Ciclo da eficiência e IA na operação |
+| 5.3 | `aula-05/5.3-plano-90-dias.md` | Métricas que realmente importam |
+| 5.4 | `aula-05/5.4-recomendacoes-executivas.md` | Roadmap de maturidade FinOps |
+| 5.5 | `aula-05/5.5-copiloto-eficiencia.md` | **Copiloto + plano 30-60-90** *(hands-on)* |
 
 ---
 
