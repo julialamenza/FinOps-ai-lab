@@ -1104,23 +1104,50 @@ Responda em português do Brasil:
 - Slide 10: Laboratório Prático: payments, users e staging
 
 **O que mostrar:**
-- Slides 9–10.
-- Terminal: `kubectl get ns --show-labels`.
-- Grafana → `finops-ai-governance.json` → Matrix, Showback, Guardrails.
-- OpenCost → `http://localhost:9003`.
-- Colar `./scripts/collect-lab-context.sh` nos prompts A, B e C.
+- Slides 9–10 (intro ~2 min), depois lab.
+- **Terminal A** — port-forwards Grafana (3000) e OpenCost (9003).
+- **Terminal B** — demo:
+-   1. `kubectl get ns --show-labels` — comparar com Governance Matrix
+-   2. `kubectl get resourcequota -A` e `kubectl get limitrange -A` — gaps do Guardrails Checklist
+-   3. `./scripts/collect-lab-context.sh` — contexto para IA
+- **Grafana** → `finops-ai-governance.json` → **Last 15 minutes**:
+-   - Resource Overview: CPU/Memory Usage e Requests by Namespace
+-   - Governance & Labels: Namespace Label Coverage + Governance Matrix
+-   - Cost Visibility: Showback View by Namespace + Showback — Nota didática
+-   - Guardrails & Tooling: Guardrails Checklist + OpenCost + AWS Cost Explorer
+- **OpenCost** → http://localhost:9003 — alocação por namespace (payments > users > staging)
+- Colar `./scripts/collect-lab-context.sh` nos prompts A (slides 4–6), B (slide 7), C (slide 9).
+- Comentar resposta da IA criticamente.
 
 **Comandos:**
 
 ```bash
+./scripts/stop-all-anomalies.sh
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
 kubectl get ns --show-labels
+kubectl get resourcequota -A
+kubectl get limitrange -A
+./scripts/warmup-lab-metrics.sh
 ./scripts/collect-lab-context.sh
+# Grafana: http://localhost:3000 → FinOps AI - Governance and Cost Visibility
+# OpenCost: http://localhost:9003
 ```
 
 **Antes de colar o prompt:**
-Hands-on. Slides 9–10. Rode `./scripts/collect-lab-context.sh` e cole a saída no bloco abaixo. Percorra Grafana (`finops-ai-governance.json`) e OpenCost antes dos prompts A, B e C.
+Hands-on. Slides 9–10. Setup: `./scripts/stop-all-anomalies.sh`, port-forwards Grafana (3000) e OpenCost (9003), `./scripts/warmup-lab-metrics.sh`.
+
+Percorra **antes** de colar os prompts:
+
+| Ordem | Onde | O quê |
+|-------|------|-------|
+| 1 | Terminal | `kubectl get ns --show-labels` → Governance Matrix |
+| 2 | Terminal | `kubectl get resourcequota -A` + `kubectl get limitrange -A` → Guardrails Checklist |
+| 3 | Grafana `finops-ai-governance.json` (Last 15 min) | Resource Overview → Governance & Labels → Cost Visibility → Guardrails & Tooling |
+| 4 | OpenCost http://localhost:9003 | Alocação por namespace/workload |
+| 5 | Terminal | `./scripts/collect-lab-context.sh` → colar abaixo |
+
+Rode `./scripts/collect-lab-context.sh` e cole a saída no bloco abaixo antes dos prompts A, B e C.
 
 **Prompt IA — copiar e colar:**
 

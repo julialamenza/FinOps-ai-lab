@@ -10,6 +10,8 @@ metadata:
     workload-type: anomaly-demo
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: cpu-spike
@@ -22,18 +24,13 @@ spec:
         workload-type: anomaly-demo
     spec:
       containers:
-        - name: stress
-          image: polinux/stress
-          env:
-            - name: STRESS_TIMEOUT
-              value: "300s"
-          command:
-            - sh
-            - -c
-            - stress --cpu 2 --timeout "${STRESS_TIMEOUT}"
-          resources:
+         - name: stress
+           image: alpine:latest
+           command: ["sh", "-c"]
+           args: ["apk add --no-cache stress-ng && stress-ng --cpu 2 --timeout 300s"]
+           resources:
             requests:
-              cpu: "500m"
+              cpu: "100m"
               memory: "128Mi"
             limits:
               cpu: "2000m"
