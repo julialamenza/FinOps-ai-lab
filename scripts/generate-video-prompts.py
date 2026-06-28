@@ -390,17 +390,20 @@ Responda em português do Brasil:
 5. Erros comuns ao expor custo para engenharia."""),
 
     ("04", "4.4", "guardrails", "AWS Cost Explorer e OpenCost — visões complementares", False,
-     "Sem demo. Slide 8 — AWS Cost Explorer + OpenCost. Opcional: screenshot AWS. Demo ao vivo fica para o vídeo 4.5.",
+     "Sem demo. Slide 8 — Cost Explorer/Billing/Budgets complementam OpenCost. Lab Minikube — não precisa EKS. Ver docs/aws-billing-gravacao.md. Demo OpenCost ao vivo fica para 4.5.",
      """Estou gravando o vídeo 4.4 (slide 8 — AWS Cost Explorer + OpenCost: Visões Complementares).
 
-Contexto: Cost Explorer mostra custo na camada cloud; OpenCost aloca na camada Kubernetes.
+Contexto de gravação:
+- Lab local Minikube — NÃO tenho EKS nem cluster Kubernetes na AWS
+- OpenCost no lab usa preços públicos AWS como estimativa (não é fatura real)
+- Cost Explorer/Billing/Budgets serão explicados como camada cloud em produção
 
 Responda em português do Brasil:
-1. O que cada ferramenta responde que a outra não responde.
-2. Como cruzar fatura AWS com alocação por namespace no OpenCost.
-3. Cenário didático: custo AWS subiu 10% — onde investigar primeiro?
-4. Limitações do OpenCost em cluster local (Minikube) vs. produção EKS.
-5. Script de 1 minuto para gravar explicando as visões complementares."""),
+1. O que cada ferramenta responde que a outra não responde (Cost Explorer, Billing, Budgets, OpenCost).
+2. Como cruzar fatura AWS com alocação por namespace no OpenCost — mesmo sem EKS na conta.
+3. Cenário didático: custo AWS subiu 10% — onde investigar primeiro (Billing → Cost Explorer → OpenCost)?
+4. Diferença entre alerta de billing (AWS Budgets) e alerta técnico (Grafana/Prometheus).
+5. Script de 1 minuto para gravar explicando as visões complementares — lab Minikube, sem demo AWS obrigatória."""),
 
     ("04", "4.5", "visibilidade-persona", "Hands-on — governança e visibilidade de custos", False,
      "Hands-on. Slides 9–10. Rode `./scripts/collect-lab-context.sh` e cole a saída no bloco abaixo. Percorra Grafana (`finops-ai-governance.json`) e OpenCost antes dos prompts A, B e C.",

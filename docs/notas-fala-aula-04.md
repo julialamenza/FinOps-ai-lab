@@ -112,6 +112,8 @@ Roteiro operacional: `docs/manual-gravacao-completo.md`
 >
 > **FinOps Analyst:** custo por cost-center, tendências mensais, budget vs actual, relatório de showback por squad. Pergunta: *quem está acima do budget?*
 >
+> *Em produção:* FinOps usa **AWS Budgets** + Cost Explorer para budget vs actual. **Na gravação:** cite como conceito — não abra console AWS (`docs/aws-billing-gravacao.md`).
+>
 > **Engineering Manager:** custo por produto, eficiência relativa entre times, impacto de decisões arquiteturais. Pergunta: *vale a pena priorizar eficiência este sprint?*
 >
 > **Liderança executiva:** visão consolidada cloud, eficiência por BU, ROI de otimização. Pergunta: *cloud está crescendo mais rápido que receita?*
@@ -135,7 +137,11 @@ Roteiro operacional: `docs/manual-gravacao-completo.md`
 >
 > Caso de uso do slide: Cost Explorer mostra EKS +30%. OpenCost revela que **`staging-api` consome ~40% dos recursos sem tráfego real** — aí você rightsiza ou escala para zero, não compra node às cegas.
 >
-> No Minikube local, OpenCost usa **preços públicos AWS** como estimativa — didático, não é fatura real. Opcional: screenshot do Cost Explorer para contrastar.
+> No Minikube local, OpenCost usa **preços públicos AWS** como estimativa — didático, não é fatura real.
+>
+> **Gravação sem EKS/conta AWS:** use slides + painel Grafana *OpenCost + AWS Cost Explorer*. **Opcional:** screenshot Cost Explorer, Billing ou Budgets. **Não abra** console AWS no hands-on 4.5. Roteiro completo: `docs/aws-billing-gravacao.md`.
+>
+> Mencione **alertas de billing** (AWS Budgets avisam na fatura) vs **alertas técnicos** (Grafana avisa no cluster).
 >
 > Cruzamento prático: `custo_namespace = custo_cluster × (requests_namespace / requests_total)` — fórmula no painel Showback do Grafana."
 
@@ -156,6 +162,8 @@ Roteiro operacional: `docs/manual-gravacao-completo.md`
 > No lab, abra o painel **Guardrails Checklist** no Grafana e rode `kubectl get resourcequota,limitrange -A` — vai ver **gaps reais** (sem quota no staging). Isso alimenta o Prompt C da IA."
 
 **Roteiro hands-on (slides 9–10 + lab):**
+
+> **Não abrir AWS** neste vídeo — Cost Explorer/Billing ficaram no 4.4 (conceitual). Aqui: OpenCost + Grafana.
 
 1. Setup: `./scripts/stop-all-anomalies.sh` + port-forwards Grafana (3000) e OpenCost (9003)
 2. Terminal: `kubectl get ns --show-labels` → comparar com **Governance Matrix**

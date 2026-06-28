@@ -7,6 +7,7 @@ from recording_data import AULA_META, CHECKLIST_MD, PORT_FORWARDS, VIDEOS, load_
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "manual-gravacao-completo.md"
+AWS_BILLING_DOC = ROOT / "docs" / "aws-billing-gravacao.md"
 
 
 def render_slides(slides: list[tuple[int, str]]) -> str:
@@ -117,6 +118,14 @@ def main() -> None:
     ]
     for aula, (_, dash) in AULA_META.items():
         parts.append(f"| {aula} | `{dash}` | {PORT_FORWARDS[aula]} |")
+    if AWS_BILLING_DOC.exists():
+        aws_section = AWS_BILLING_DOC.read_text(encoding="utf-8")
+        # Drop title — manual already has Parte 1 heading structure
+        aws_body = aws_section.split("\n", 1)[1].strip() if aws_section.startswith("#") else aws_section
+        parts.extend([
+            "",
+            aws_body,
+        ])
     parts.extend([
         "",
         "### Legenda de tipos",

@@ -51,6 +51,72 @@ minikube start --cpus=4 --memory=8192
 | 4 | `grafana/dashboards/finops-ai-governance.json` | Grafana + OpenCost (vídeo 4.5) |
 | 5 | `Todos os dashboards anteriores` | Grafana + OpenCost (vídeo 5.5) |
 
+O curso roda em **Minikube local**. **Não é obrigatório** ter Kubernetes na AWS (EKS), conta AWS ativa, nem abrir o console AWS ao vivo.
+
+## O que demo ao vivo vs conceitual
+
+| Ferramenta AWS | Demo ao vivo? | Vídeos |
+|----------------|---------------|--------|
+| **Cost Explorer** | Opcional (screenshot ou console) | **4.4** (principal), menção em 5.3 |
+| **Billing (fatura)** | Não — conceitual ou screenshot | 4.4, 5.3, 5.5 (plano 90 dias) |
+| **Budgets / alertas de billing** | Não — conceitual ou screenshot | 4.3, 5.3, 5.5 |
+| **OpenCost** (no Minikube) | **Sim** — demo principal | 4.5, 5.5 |
+
+**Hands-on (4.5 e 5.5):** use **OpenCost** (`http://localhost:9003`) + Grafana. **Não abra** Cost Explorer nem Billing durante o hands-on — fica confuso e não reflete o lab.
+
+## Três modos de gravação
+
+### Modo A — Sem conta AWS *(recomendado)*
+
+- Use **slides** + painel *OpenCost + AWS Cost Explorer* no dashboard `finops-ai-governance.json`.
+- Fale: *"Nosso lab é Minikube local; em produção o Cost Explorer mostraria a fatura cloud e o OpenCost alocaria por namespace."*
+- Caso EKS +30% do slide = **cenário ilustrativo**, não precisa existir na sua conta.
+
+### Modo B — Com conta AWS, sem EKS
+
+- **Screenshot** do Cost Explorer (*Cost by Service*, últimos 30 dias) — qualquer serviço (EC2, S3, etc.) serve para mostrar visão de conta.
+- **Budgets:** screenshot de um budget de exemplo ou slide; explique alertas por e-mail/SNS quando custo > 80% do budget.
+- **Não precisa** linha EKS na fatura — o cruzamento com namespace continua sendo explicado com OpenCost local.
+
+### Modo C — Com EKS *(opcional, produção)*
+
+- Cost Explorer filtrado em *Elastic Kubernetes Service* + OpenCost por namespace.
+- Mostre cruzamento real: fatura EKS subiu → OpenCost aponta namespace/workload.
+
+## Script de fala (~30 s) — vídeo 4.4
+
+> "O lab roda em Minikube — não temos cluster na AWS. O OpenCost simula custo por namespace com preços públicos AWS. O Cost Explorer, em produção, mostra o custo **real da infra cloud** — EC2, EKS, load balancers, storage. As duas ferramentas se complementam: a fatura sobe no Billing → Cost Explorer aponta o **serviço** → OpenCost aponta o **namespace/workload**. Budgets e alertas de billing avisam **antes** da surpresa na fatura; alertas no Grafana/OpenCost avisam **dentro** do cluster."
+
+## Onde cada conceito aparece
+
+| Vídeo | Slide | AWS console? | O que fazer |
+|-------|-------|--------------|-------------|
+| 1.4 | 10–12 | Não | Alertas = Grafana/Prometheus; mencione que em produção **Billing alerts** complementam |
+| 4.3 | 7 | Não | FinOps persona: budget vs actual — **conceitual**; cite AWS Budgets como exemplo |
+| **4.4** | **8** | **Opcional** | **Cost Explorer + Billing + Budgets** — teoria; screenshot ou Modo A |
+| 4.5 | 9–10 | **Não** | OpenCost + Grafana ao vivo; painel comparativo no dashboard = referência |
+| 5.3 | 7 | Não | OpenCost vs Cost Explorer — complementares; sem abrir AWS |
+| 5.4 | 8 | Não | Estágio Governança = budgets — conceitual |
+| 5.5 | 9–10 | **Não** | Plano 90 dias cita budgets/alertas — OpenCost + 4 dashboards ao vivo |
+
+## Screenshots sugeridos (Modo A ou B)
+
+Salve em `docs/screenshots/` (não commitar dados sensíveis):
+
+| Arquivo sugerido | Conteúdo | Usar em |
+|------------------|----------|---------|
+| `cost-explorer-by-service.png` | Cost Explorer → Cost by Service | 4.4 |
+| `aws-billing-monthly.png` | Billing → Bills → Total (valores borrados se necessário) | 4.4 |
+| `aws-budget-alert.png` | Budgets → budget com threshold 80%/100% | 4.3 ou 4.4 |
+
+## Checklist AWS (antes de gravar 4.3–4.4)
+
+- [ ] Decidi o modo: **A** (sem AWS), **B** (screenshots) ou **C** (conta com EKS)
+- [ ] Screenshots preparados *(Modo A/B)* — ou usar apenas slides
+- [ ] Console AWS **fora** da gravação do hands-on 4.5
+- [ ] Conta ID, nomes de conta e valores reais **borrados** se usar screenshot
+- [ ] OpenCost testado em `localhost:9003` *(4.5)*
+
 ### Legenda de tipos
 
 | Tipo | Significado |
@@ -245,6 +311,7 @@ Responda em português do Brasil:
 - Grafana → painéis do `finops-ai-lab.json`.
 - Mencionar Prometheus (`localhost:9090`) — opcional.
 - Gráficos do slide = exemplo conceitual; compare com Grafana ao vivo.
+- **AWS Billing/Budgets:** não abrir console — mencione que alertas de fatura (AWS Budgets) **complementam** alertas técnicos no Grafana. Ver `docs/aws-billing-gravacao.md`.
 
 **Comandos:**
 
@@ -256,6 +323,8 @@ kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 909
 
 **Antes de colar o prompt:**
 Slides + menção Prometheus/Grafana. Gráficos de slide como exemplo conceitual.
+
+**AWS (conceitual):** alertas no Grafana/Prometheus são a demo; mencione que em produção **AWS Budgets** alertam sobre a fatura antes da surpresa. Não abrir console AWS. Ver `docs/aws-billing-gravacao.md`.
 
 **Prompt IA — copiar e colar:**
 
@@ -1015,13 +1084,16 @@ Responda em português do Brasil:
 **O que mostrar:**
 - Slide 7.
 - Conceitual — dashboards e rituais por persona.
+- FinOps persona: budget vs actual — cite **AWS Budgets** e alertas de billing como exemplo **em produção** (sem abrir console).
 - Demo no Grafana fica para o vídeo 4.5.
-- Sem terminal.
+- Sem terminal. Ver `docs/aws-billing-gravacao.md`.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Slide 7 — Visibilidade para Diferentes Personas. Demo no Grafana fica para o vídeo 4.5.
+
+**AWS (conceitual):** persona FinOps usa budget vs actual — cite **AWS Budgets** e alertas de billing como exemplo em produção. **Não abra** console AWS. Ver `docs/aws-billing-gravacao.md`.
 
 **Prompt IA — copiar e colar:**
 
@@ -1061,29 +1133,45 @@ Responda em português do Brasil:
 
 **O que mostrar:**
 - Slide 8.
-- Conceitual — infra cloud vs camada Kubernetes.
-- Opcional: screenshot AWS Cost Explorer.
-- Demo ao vivo fica para o vídeo 4.5.
+- **Lab local (Minikube) — não precisa de EKS nem conta AWS.**
+- Conceitual — infra cloud (Cost Explorer/Billing) vs camada Kubernetes (OpenCost).
+- **Modo recomendado:** slides + script de 30 s (`docs/aws-billing-gravacao.md`).
+- **Opcional:** screenshot Cost Explorer, Billing ou AWS Budgets — sem demo ao vivo obrigatória.
+- Mencionar alertas de billing (Budgets) vs alertas técnicos (Grafana).
+- Demo OpenCost ao vivo fica para o vídeo 4.5.
 - Sem terminal.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
-Sem demo. Slide 8 — AWS Cost Explorer + OpenCost. Opcional: screenshot AWS. Demo ao vivo fica para o vídeo 4.5.
+Sem demo de terminal. Slide 8 — Cost Explorer, Billing e Budgets **complementam** OpenCost.
+
+**Lab local:** Minikube — **não precisa** de EKS nem abrir AWS ao vivo. Três opções:
+
+| Modo | O que fazer |
+|------|-------------|
+| **A (recomendado)** | Slides + painel *OpenCost + AWS Cost Explorer* no Grafana + script de 30 s no doc AWS |
+| **B** | Screenshot Cost Explorer / Billing / Budgets (valores borrados) |
+| **C** | Console AWS ao vivo *(só se tiver conta; EKS opcional)* |
+
+Mencione **alertas de billing** (AWS Budgets) vs **alertas técnicos** (Grafana). Demo OpenCost ao vivo fica para o **vídeo 4.5**.
 
 **Prompt IA — copiar e colar:**
 
 ```
 Estou gravando o vídeo 4.4 (slide 8 — AWS Cost Explorer + OpenCost: Visões Complementares).
 
-Contexto: Cost Explorer mostra custo na camada cloud; OpenCost aloca na camada Kubernetes.
+Contexto de gravação:
+- Lab local Minikube — NÃO tenho EKS nem cluster Kubernetes na AWS
+- OpenCost no lab usa preços públicos AWS como estimativa (não é fatura real)
+- Cost Explorer/Billing/Budgets serão explicados como camada cloud em produção
 
 Responda em português do Brasil:
-1. O que cada ferramenta responde que a outra não responde.
-2. Como cruzar fatura AWS com alocação por namespace no OpenCost.
-3. Cenário didático: custo AWS subiu 10% — onde investigar primeiro?
-4. Limitações do OpenCost em cluster local (Minikube) vs. produção EKS.
-5. Script de 1 minuto para gravar explicando as visões complementares.
+1. O que cada ferramenta responde que a outra não responde (Cost Explorer, Billing, Budgets, OpenCost).
+2. Como cruzar fatura AWS com alocação por namespace no OpenCost — mesmo sem EKS na conta.
+3. Cenário didático: custo AWS subiu 10% — onde investigar primeiro (Billing → Cost Explorer → OpenCost)?
+4. Diferença entre alerta de billing (AWS Budgets) e alerta técnico (Grafana/Prometheus).
+5. Script de 1 minuto para gravar explicando as visões complementares — lab Minikube, sem demo AWS obrigatória.
 ```
 
 \newpage
@@ -1105,6 +1193,7 @@ Responda em português do Brasil:
 
 **O que mostrar:**
 - Slides 9–10 (intro ~2 min), depois lab.
+- **Não abrir AWS console** (Cost Explorer/Billing) neste vídeo — use OpenCost + Grafana.
 - **Terminal A** — port-forwards Grafana (3000) e OpenCost (9003).
 - **Terminal B** — demo:
 -   1. `kubectl get ns --show-labels` — comparar com Governance Matrix
@@ -1114,7 +1203,7 @@ Responda em português do Brasil:
 -   - Resource Overview: CPU/Memory Usage e Requests by Namespace
 -   - Governance & Labels: Namespace Label Coverage + Governance Matrix
 -   - Cost Visibility: Showback View by Namespace + Showback — Nota didática
--   - Guardrails & Tooling: Guardrails Checklist + OpenCost + AWS Cost Explorer
+-   - Guardrails & Tooling: Guardrails Checklist + painel *OpenCost + AWS Cost Explorer* (referência, não substitui demo)
 - **OpenCost** → http://localhost:9003 — alocação por namespace (payments > users > staging)
 - Colar `./scripts/collect-lab-context.sh` nos prompts A (slides 4–6), B (slide 7), C (slide 9).
 - Comentar resposta da IA criticamente.
@@ -1132,10 +1221,13 @@ kubectl get limitrange -A
 ./scripts/collect-lab-context.sh
 # Grafana: http://localhost:3000 → FinOps AI - Governance and Cost Visibility
 # OpenCost: http://localhost:9003
+# AWS Cost Explorer/Billing: NÃO usar ao vivo — ver docs/aws-billing-gravacao.md
 ```
 
 **Antes de colar o prompt:**
 Hands-on. Slides 9–10. Setup: `./scripts/stop-all-anomalies.sh`, port-forwards Grafana (3000) e OpenCost (9003), `./scripts/warmup-lab-metrics.sh`.
+
+**Não abrir AWS** (Cost Explorer/Billing/Budgets) neste vídeo — demo = OpenCost + Grafana. Painel comparativo no dashboard é referência visual. Ver `docs/aws-billing-gravacao.md`.
 
 Percorra **antes** de colar os prompts:
 
@@ -1317,12 +1409,15 @@ Responda em português do Brasil:
 **O que mostrar:**
 - Slide 7.
 - Conceitual — KPIs operacionais e FinOps.
+- OpenCost vs Cost Explorer — complementares; **sem abrir AWS** (ver `docs/aws-billing-gravacao.md`).
 - Sem lab.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Slide 7 — Métricas que Realmente Importam.
+
+OpenCost vs Cost Explorer — complementares. **Sem abrir AWS**; lab = Minikube + OpenCost. Ver `docs/aws-billing-gravacao.md`.
 
 **Prompt IA — copiar e colar:**
 
@@ -1358,12 +1453,15 @@ Responda em português do Brasil:
 **O que mostrar:**
 - Slide 8.
 - Conceitual — estágios de maturidade e desbloqueios.
+- Estágio Governança: budgets e alertas de billing — **conceitual** (AWS Budgets); lab usa OpenCost + Grafana.
 - Sem lab.
 
 **Comandos:** Nenhum.
 
 **Antes de colar o prompt:**
 Sem demo. Slide 8 — Roadmap de Maturidade FinOps.
+
+Estágio Governança cita budgets — explique **AWS Budgets** como conceito; lab usa OpenCost. Ver `docs/aws-billing-gravacao.md`.
 
 **Prompt IA — copiar e colar:**
 
@@ -1403,24 +1501,53 @@ Responda em português do Brasil:
 - Slide 10: Plano de Ação 30-60-90 Dias
 
 **O que mostrar:**
-- Slides 9–10.
-- Percorrer 4 dashboards (1 min cada) → **Last 15 minutes**.
-- Resumo: payments over, users ok, staging sub, anomalias = lição.
-- OpenCost → visão consolidada.
-- Colar `./scripts/collect-lab-context.sh` no **prompt mestre**.
-- Apresentar plano 30-60-90 e KPIs da resposta da IA.
+- Slides 9–10 (intro ~2 min), depois lab.
+- **Não abrir AWS console** — plano 90 dias cita budgets/alertas como ação futura; demo = OpenCost + Grafana.
+- **Terminal A** — port-forwards Grafana (3000) e OpenCost (9003).
+- **Terminal B** — demo:
+-   1. `./scripts/stop-all-anomalies.sh` + `./scripts/warmup-lab-metrics.sh`
+-   2. `./scripts/collect-lab-context.sh` + `kubectl top pods -A`
+- **Grafana** — tour **Last 15 minutes** (~1 min cada dashboard):
+-   1. `finops-ai-lab.json` — CPU/Memory por namespace, Top Consumers
+-   2. `finops-ai-rightsizing.json` — CPU Waste %, Top Overprovisioned, Rightsizing Candidates
+-   3. `finops-ai-anomalies.json` — CPU Spike Detector, Capacity Headroom (baseline, sem spike)
+-   4. `finops-ai-governance.json` — Showback View, Governance Matrix, Guardrails Checklist
+- **OpenCost** → http://localhost:9003 — alocação consolidada por namespace
+- Narrar achados: payments over, users ok, staging sub, anomalias = lição (Aula 3).
+- Colar `./scripts/collect-lab-context.sh` + observações dos 4 dashboards no **prompt mestre**.
+- Apresentar: diagnóstico, top 3 ações, plano 30-60-90, KPIs, template reutilizável.
 
 **Comandos:**
 
 ```bash
+./scripts/stop-all-anomalies.sh
 kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 kubectl port-forward -n opencost svc/opencost 9003:9090
+./scripts/warmup-lab-metrics.sh
 ./scripts/collect-lab-context.sh
 kubectl top pods -A
+# Grafana: http://localhost:3000 → 4 dashboards (Last 15 minutes)
+# OpenCost: http://localhost:9003
+# AWS Cost Explorer/Billing: NÃO usar ao vivo — ver docs/aws-billing-gravacao.md
 ```
 
 **Antes de colar o prompt:**
-Hands-on final. Slides 9–10. Cole `./scripts/collect-lab-context.sh` na seção `[DADOS]`. Percorra os 4 dashboards Grafana e OpenCost antes de colar.
+Hands-on final. Slides 9–10. Setup: `./scripts/stop-all-anomalies.sh`, port-forwards Grafana (3000) e OpenCost (9003), `./scripts/warmup-lab-metrics.sh`.
+
+**Não abrir AWS** — plano 30-60-90 cita budgets/alertas como ação futura; demo = 4 dashboards Grafana + OpenCost. Ver `docs/aws-billing-gravacao.md`.
+
+Percorra **antes** de colar o prompt mestre:
+
+| Ordem | Onde | O quê |
+|-------|------|-------|
+| 1 | Grafana `finops-ai-lab.json` (Last 15 min) | Consumo por namespace, Top CPU/Memory Consumers |
+| 2 | Grafana `finops-ai-rightsizing.json` | CPU Waste %, Top Overprovisioned, Rightsizing Candidates |
+| 3 | Grafana `finops-ai-anomalies.json` | CPU Spike Detector, Capacity Headroom (baseline) |
+| 4 | Grafana `finops-ai-governance.json` | Showback View, Governance Matrix, Guardrails Checklist |
+| 5 | OpenCost http://localhost:9003 | Alocação consolidada por namespace |
+| 6 | Terminal | `./scripts/collect-lab-context.sh` + `kubectl top pods -A` → colar em `[DADOS]` |
+
+Narrar: payments overprovisionado, users ok, staging subutilizado, anomalias (Aula 3) como lição operacional.
 
 **Prompt IA — copiar e colar:**
 
@@ -1548,7 +1675,9 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] `kubectl get ns --show-labels` mostra labels team, environment, cost-center *(vídeo 4.5)*
 - [ ] `./scripts/collect-lab-context.sh` testado *(vídeo 4.5)*
 - [ ] Seção da Aula 4 no manual revisada (vídeos 4.1–4.5)
-- [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
+- [ ] Leu `docs/aws-billing-gravacao.md` — decidiu Modo A/B/C para vídeos 4.3–4.4
+- [ ] Screenshots AWS preparados *(opcional, Modo B)* ou usa só slides *(Modo A)*
+- [ ] Console AWS **fora** do hands-on 4.5
 
 ### Aula 5 — Eficiência operacional
 
@@ -1557,7 +1686,7 @@ Checklist operacional para garantir qualidade técnica e consistência em cada s
 - [ ] `./scripts/collect-lab-context.sh` testado *(vídeo 5.5 — prompt mestre)*
 - [ ] Seção da Aula 5 no manual revisada (vídeos 5.1–5.5)
 - [ ] Achados das aulas 1–4 anotados para o fluxo completo
-- [ ] *(Opcional)* Screenshot do AWS Cost Explorer preparado
+- [ ] Console AWS **fora** do hands-on 5.5 (budgets/alertas = conceitual no plano 90 dias)
 
 ---
 

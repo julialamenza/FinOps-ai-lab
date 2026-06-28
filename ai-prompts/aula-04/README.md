@@ -2,7 +2,8 @@
 
 Prompts organizados **um por vídeo**. Abra o arquivo do vídeo que está gravando.
 
-**Notas de fala por slide:** `docs/notas-fala-aula-04.md`
+**Notas de fala por slide:** `docs/notas-fala-aula-04.md`  
+**AWS (sem EKS):** `docs/aws-billing-gravacao.md`
 
 | Vídeo | Slides | Arquivo | Tema |
 |-------|--------|---------|------|
